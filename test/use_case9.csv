@@ -1,0 +1,4 @@
+Root,UseCases,,,
+,%UseCases,,,
+[]UseCases{1..002},Subpath,Id,Description ,/Setup.MyDb.[]Customer
+,usecase9/${index},$index,#use_case.txt,"#customer.json|{""DAILY_CAP"":100, ""OVERALL_CAP"":1000}"

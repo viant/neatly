@@ -1,0 +1,6 @@
+Root,Repeated,,
+,%Repeated,,
+[]Repeated{1 .. 05},Id,Name,
+,${index},Name ${index},
+,,,
+,,,

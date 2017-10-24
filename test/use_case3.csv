@@ -1,0 +1,6 @@
+Root,Merits,,Created
+,%Merits,,2017-10-10
+[]Merits,Empno,Description,/[]Bonus
+,1,Increase sales by 400%,"{""EmpNo"":1, ""Name"":""Smith"", ""Amount"":10000}"
+,2,Reduced cost by 30%,"{""EmpNo"":2, ""Name"":""Kowalczyk"", ""Amount"":8000}"
+,3,Improve resource reusibility by 40%,"{""EmpNo"":3, ""Name"":""Schmidt"", ""Amount"":4000}"

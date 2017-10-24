@@ -1,0 +1,6 @@
+{
+  "ID": 1,
+  "NAME": "Smith",
+  "DAILY_CAP": "!AsFloat($dailyCap)",
+  "OVERALL_CAP": "!AsFloat($overallCap)"
+}
