@@ -36,7 +36,14 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	if err != nil {
 		return err
 	}
-	targetMap["Source"] = source
+
+	var sourceMap = make(map[string]interface{})
+
+	err = d.converter.AssignConverted(&sourceMap, source);
+	if err != nil {
+		return err
+	}
+	targetMap["Source"] = sourceMap
 	return d.converter.AssignConverted(target, targetMap)
 }
 
@@ -324,7 +331,7 @@ func (d *Dao) getExternalResource(context data.Map, owner *url.Resource, subpath
 	exists, err := service.Exists(URL)
 	if !exists {
 		if d.remoteResourceRepo != "" {
-			fallbackResource, err := d.newFallbackResource(context, URI)
+			fallbackResource, err := d.NewRepoResource(context, URI)
 			if err == nil {
 				service, _ = storage.NewServiceForURL(fallbackResource.URL, owner.Credential)
 				if exists, _ = service.Exists(fallbackResource.URL); exists {
@@ -360,10 +367,10 @@ func buildURLWithOwnerURL(owner *url.Resource, subpath string, URI string) (stri
 }
 
 /*
-newFallbackResource returns resource build as localResourceURL/remoteResourceURL and URI
+NewRepoResource returns resource build as localResourceURL/remoteResourceURL and URI
 If Local resource does not exist but remote does it copy it over to Local to avoid remote round trips in the future.
 */
-func (d *Dao) newFallbackResource(context data.Map, URI string) (*url.Resource, error) {
+func (d *Dao) NewRepoResource(context data.Map, URI string) (*url.Resource, error) {
 	var localResourceURL = fmt.Sprintf(d.localResourceRepo, URI)
 	var localResource = url.NewResource(localResourceURL)
 
@@ -469,7 +476,7 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, subpath, as
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -490,11 +497,11 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1 : len(value)-1]), nil
+		return string(value[1: len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1 : len(value)-1]), nil
+		return string(value[1: len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {
