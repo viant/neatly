@@ -398,14 +398,14 @@ Where
         {
           "ID": 1,
           "NAME": "Smith",
-          "DAILY_CAP": "100",
-          "OVERALL_CAP": "1000"
+          "DAILY_CAP": 100,
+          "OVERALL_CAP": 1000
         },
         {
           "ID": 2,
           "NAME": "Kowalczyk",
-          "DAILY_CAP": "400",
-          "OVERALL_CAP": "8000"
+          "DAILY_CAP": 400,
+          "OVERALL_CAP": 8000
         }
       ]
     }
@@ -480,14 +480,14 @@ use case 2
         {
           "ID": 1,
           "NAME": "Smith",
-          "DAILY_CAP": "100",
-          "OVERALL_CAP": "1000"
+          "DAILY_CAP": 100,
+          "OVERALL_CAP": 1000
         },
         {
           "ID": 2,
           "NAME": "Kowalczyk",
-          "DAILY_CAP": "100",
-          "OVERALL_CAP": "1000"
+          "DAILY_CAP": 100,
+          "OVERALL_CAP": 1000
         }
       ]
     }
@@ -529,8 +529,8 @@ use case 1
 {
    "ID": 1,
    "NAME": "Smith",
-   "DAILY_CAP": "!AsFloat($dailyCap)",
-   "OVERALL_CAP": "!AsFloat($overallCap)"
+   "DAILY_CAP": "!AsInt($dailyCap)",
+   "OVERALL_CAP": "!AsInt($overallCap)"
  
 }
 ```
@@ -547,8 +547,8 @@ use case 2
 {
   "ID": 2,
   "NAME": "Kowalczyk",
-   "DAILY_CAP": "!AsFloat($dailyCap)",
-   "OVERALL_CAP": "!AsFloat($overallCap)"
+   "DAILY_CAP": "!AsInt($dailyCap)",
+   "OVERALL_CAP": "!AsInt($overallCap)"
 }
 ```
 
