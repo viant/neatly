@@ -359,10 +359,12 @@ Where
 ```json
   [
         {
-          "Math": 3.2
+           "Subject":"Math",
+           "Score": 3.2
         },
         {
-          "English": 3.5
+          "Subject":"English",
+           "Score":3.5
         }
   ]
 
@@ -373,10 +375,12 @@ Where
 ```json
   [
         {
-          "Math": 3.2
+           "Subject":"Math",
+           "Score": 3.7
         },
         {
-          "English": 3.5
+           "Subject":"English",
+           "Score":3.2
         }
   ]
 
@@ -424,8 +428,8 @@ Neatly tabular representation.
 | Root | UseCases | | | | 
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
-| **[]UseCases{1..2}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
-| | usecase7/${index} / | $index | \#useCase.json |  \#customer.json |
+| **[]UseCases{1..002}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
+| | usecase7/${index} / | $index | \#use_case.txt |  \#customer.json |
 
 
 Where
