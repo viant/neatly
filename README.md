@@ -467,7 +467,7 @@ use case 2
 }
 ```
 
-### External resources loading with value substitution and user defined function (udf) use case.
+### External resources loading with piping substitution and user defined function (udf) use case.
 
 
    Take as example the following data structure:
