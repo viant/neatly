@@ -512,7 +512,7 @@ Neatly tabular representation.
 | Root | UseCases | | | | 
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
-| **[]UseCases{1..2}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
+| **[]UseCases{1..002}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
 | | usecase8/${index} / | $index | \#useCase.json |  \#customer.json\| {"dailyCap":100, "overallCap":1000} |
 
 
