@@ -55,7 +55,8 @@ func Md5(source interface{}, state data.Map) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+	var result =  fmt.Sprintf("%x", hash.Sum(nil))
+	return result, nil
 }
 
 //HasResource check if patg/url to external resource exists
@@ -65,6 +66,9 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 		var workflowPath = strings.Replace(state.GetString(OwnerURL), toolbox.FileSchema, "", 1)
 		parentDirecotry, _ = path.Split(workflowPath)
 	}
+
+
+
 	filename := path.Join(parentDirecotry, toolbox.AsString(source))
 	var result = toolbox.FileExists(filename)
 	return result, nil

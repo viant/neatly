@@ -30,7 +30,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	if err != nil {
 		return err
 	}
-	d.addStandardUdf(context)
+	d.AddStandardUdf(context)
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	targetMap, err := d.load(context, source, scanner)
 	if err != nil {
@@ -47,8 +47,8 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	return d.converter.AssignConverted(target, targetMap)
 }
 
-//addStandardUdf register building udf to the context
-func (d *Dao) addStandardUdf(context data.Map) {
+//AddStandardUdf register building udf to the context
+func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("AsMap", AsMap)
 	context.Put("AsInt", AsInt)
 	context.Put("AsFloat", AsFloat)

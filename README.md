@@ -703,6 +703,10 @@ unless object needs to expose the following functionality:
  3) **Subpath** expanded value of subpath if it has been defined as column.
 
 
+### Comments
+
+In order to skip loading line start line with // followed by some optional comments.
+
 
 <a name="Usage"></a>
 ## Usage 
