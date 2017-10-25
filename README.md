@@ -243,9 +243,9 @@ Op top of that bonus value uses json notation, which may not be too elegant.
 | --- | --- | --- | --- | --- | --- | --- |
 | |	%Merits| 2017-10-10 | | |  |  | 
 |**[]Merits**|**Empno**| **Description** | **/[]Bonus** | **:emp.EmpNo** | **:emp.Name** | **:emp.Amount** |
-| |	$emp.id |	Increased sales by 400% | $emp |	 1 | Smith | 10000  |
-| |	$emp.id |	Reduced cost by 30% | $emp | 2 |  Kowalczyk | 8000 |
-| |	$emp.id |	Improved resource reusibility by 40% | $emp | 3 | Schmidt |4000 |
+| |	$emp.EmpNo |	Increased sales by 400% | $emp |	 1 | Smith | 10000  |
+| |	$emp.EmpNo |	Reduced cost by 30% | $emp | 2 |  Kowalczyk | 8000 |
+| |	$emp.EmpNo |	Improved resource reusibility by 40% | $emp | 3 | Schmidt |4000 |
 
 In this case the virtual object emp was defined by 3 fields prefixed with colon(:) sing. In order to reference virtual 
 object dollar sign expression is being used.
