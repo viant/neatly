@@ -728,8 +728,11 @@ In order to skip loading line start line with // followed by some optional comme
     var localAssetRepo, remoteAssetRepo string
 	dao := neatly.NewDao(localAssetRepo, remoteAssetRepo, "yyyy-MM-dd h:mm:ss", nil)
 	
+	var ufgNilFunction//
+	
 	var context = data.NewMap()
-    //register your udf where
+	context.Put("Nil", ufgNilFunction)
+    //register here udf where
     
     
     
