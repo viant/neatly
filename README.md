@@ -34,26 +34,29 @@ Neatly is a neat format for representing nested structured data, with simple tab
 
 Neatly use tabular format thus can be easily store as csv or other delimitered format,
 
-The first column in a row if it is not empty represents **an object tag** followed by this object fields expression, 
-otherwise row contains values for corresponding object.
+The first column in a row represent an **object tag**,  followed by columns to define this object fields.
+Next row/s would define object tag values, in this case the first column would be left empty.
+You can thing of an object tag as it is an object definition, whereas object values would creates one or more the object instances.
+Object tag can represents a single instance or an instance element wthin an array.
+In the latter case object tag would be created with **[]** prefix.
 
-Tag can be define an object or an object in an array, in the latter case tag would have **open and close square bracket []** prefix.
 
-
-Field expression is an expression that defines path to a target object.
-Field expression can be prefixed with 
+The field definition defines a path to the leaf object of an object tag..
+It can be prefixed with 
    1) **square bracket '[]'** to denote that field is an array, all rows below will be elements for the array, unless there is empty line
-   2) **backslash '/'** to denote that field belongs to root object rather then preceding tag object
+   2) **slash '/'** to denote that field belongs to root object rather then preceding tag object
    3) **colon ':'**  to denote that field of a virtual object that can be used as data substitution with dollar($) sign expression.
    
-On top of that field name can use dot (.) to define nested object or array elements. 
+On top of that field definition can use dot (.) to define nested object of object or array type. 
 For instance 
-   1) field1 is reference to a field1 
-   2) []field2.attr2 is reference to field2 which is an array, that has object with field named 'attr2'
-   3) field3.[]a.attr3 is a reference to an object by field 'field3' which has an array named 'a' and array has an object with field named 'attr3'.
-   4) /data.[]tables is a reference to root object which has data field that points to object, which has an array accessible by field tables.
-   5) :v.attr5 is a reference to virtual object which has field 'v' pointing to object that has 'attr5' field
-   
+   1) field1 defines 'field1' field.
+   2) []field2.attr2 defines 'field2' filed  of an array of an object type, which has 'attr2' field.
+   3) field3.[]a.attr3 defines 'field3' field of an object type, which has another 'a' field  of an array of object type with 'attr3' field.
+   4) /data.[]tables defines in the root object 'data' field of an object type which has another 'tables' field of an array type.
+   5) :v.attr5 defines a virtual object which has 'v' field  of an object type which has another 'attr5' field .
+
+
+## Neatly capabilities
 
 Use cases 
 ### Basic data structure with repeated fields.
@@ -104,12 +107,12 @@ Neatly tabular representation.
 | | | GET | http://127.0.0.1/test2 | {"Cookie1":"value1", "Cookie1":"value2"}   |  404  |  | |
 
   
-In this case we have only one tag called root which has simple and repeated fields.  
+In this case we have only one object tag called root which has simple and repeated fields.  
 Note that {} or [] prefix, sufix in an object value converts value to an object or array respectively.
 You can escape **{** ... **}**  with **{{** ... **}}** quote 
 or  **[** ... **]** with **[[** ... **]]** to represent value as text instead.
  
-###  One to many with forward reference use case
+###  One to many with forward object tag reference use case
  
    Take as example the following data structure:
   
@@ -178,8 +181,9 @@ In this case we have 5 tags each defining its own objects,
 Note that percentage (%) prefixed object's value will be substitute with the object matching tag's value.
 **Percentage (%)** denotes forward reference, which means that referencing tag definition takes places in the following rows.
 
+You can escape **%** ... **%%**.
 
-### Root field with data cohesion use case.
+### Root object tag field with data cohesion use case.
 
    ```json
 {
@@ -221,7 +225,7 @@ Note that percentage (%) prefixed object's value will be substitute with the obj
 Neatly tabular representation.
 
 
-| Root|	Merits | Created | |
+| SomeName | Merits | Created | |
 | --- | --- | --- | --- |
 | |	%Merits| 2017-10-10 | |
 |**[]Merits**|**Empno**| **Description** | **/[]Bonus** |
@@ -231,7 +235,7 @@ Neatly tabular representation.
 
 In this case "Bonus filed" on Merits tag is actual root object field reference. 
 Cohesion has been achieved by placing  data related the same employee in the same row.
-Note that root object uses **backslash(/)** in the field name
+Note that root object uses **slash(/)** in the field name
 
 ###  Virtual Objects for data sharing use case.
 
@@ -250,7 +254,7 @@ Op top of that bonus value uses json notation, which may not be too elegant.
 In this case the virtual object emp was defined by 3 fields prefixed with colon(:) sing. In order to reference virtual 
 object dollar sign expression is being used.
 
-### Loading repeated data with iterator expression use case.
+### Loading repeated data with an object tag range expression use case.
 
 
    Take as example the following data structure:
@@ -293,8 +297,16 @@ Neatly tabular representation.
 | |	 $index | Name $index  |
 
 
-In this case Repeted tag uses expression in the {  } to define iteration range.
-Note that number of digits of the max in range expression add default index padding template.
+
+In this case Repeted tag uses expression in the {  } to define object tag range.
+
+Index is a special/reserved keyword in this context it would expand to 01 in the firs iteration followed by 02, 03, 04 and 05.
+If there are more than one value row, all can be expanded to the same index value within the same iteration.
+
+
+Note that number of digits in the upper bound range value creates a padding template.
+1 .. 010 -> would '0' left pad an index to 3 digits
+1 .. 00100 -> would '0' left pad an index to 5 digits.
 
 
 ### Data delegation and loading external resources use case
@@ -351,7 +363,7 @@ In this case scores are loaded from local json file.
 
 External resource starts with **pound (\#)** sing and can be relative, absolute path or a valid URL to any content. 
 In case of json or yaml files, the content  is treated as data structure.
-To escape '#' use '##'.
+**To escape '#' use '##'.**
 
 Where 
 \#scores1.json
@@ -467,6 +479,11 @@ use case 2
 }
 ```
 
+
+Note that external lookup first check if resource exists in subpath if not it will check if it exists in the 
+same directory as a master file (source of the tabular data).
+
+
 ### External resources loading with piping substitution and user defined function (udf) use case.
 
 
@@ -552,18 +569,16 @@ use case 2
 }
 ```
 
-In this case content of the #customer.json  we substituted with dailyCap and overallCap values.
+In this case content of the #customer.json were substituted with dailyCap and overallCap values.
+Since customer represents valid JSON, dailyCap and overallCap are being substitute.
+Note that there are being expaned in double qoutes thus they became of text type.
+In order to convert then to int data type, AsInt user defined function is being used.
 
-Pipe is used to provide substitution source, it can be a json value, or another external resource to json or yaml file.
+Pipe is used to provide substitution source, it can be a JSON object, or another external resource to JSON or YAML file.
 Multi piping substitution is supported.
-
-Since customer represents valid json substitution produces text data type for DAILY_CAP,OVERALL_CAP.
-We can convert these value to float by calling building udf.
-
 
 
 Neatly tabular alternative representation.
-
 
 
 | Root | UseCases | | | | 
@@ -603,8 +618,6 @@ The following special variables are available for substitution:
   2) $arg{index} - full piping content.
      
   Where  index corresponds to piping number starting with 0 
-
-
 
 
 ### User defined functions (udf)
@@ -682,14 +695,11 @@ Neatly tabular representation.
 
 
 
-
 ### Loading external resources lookups
-
 
 1) For valid URL, new resource if returned with owner resource credential
 2) For asset starting  with /, a new file resource if returned with owner resource credential
-3) For asset starting with #,  asset is being loaded relative path asset
-4) For asset with relative path the following lookup are being used, the first successful creates a new resource with owner resource credential
+3) For asset is a relative path then the following lookup are being used with the first successful to be used.
 	a) owner resource path with subpath if provided and asset name
 	b) owner resource path  without subpath and asset name
 	c) Local/remoteResourceRepo and asset name
@@ -697,20 +707,17 @@ Neatly tabular representation.
 
 ### Accessing meta data 
 
-For every object the following attributes will be set, 
-thus they should be treated as reserved keyword, 
-unless object needs to expose the following functionality:
-
+For every object the following attributes will be set as object values, 
+thus they should be treated as reserved keyword,  unless object needs to expose them.
 
  1) **Tag** name of currently processing tag.
- 2) **TagIndex** index value if within iterator processing stage.
- 3) **Subpath** expanded value of subpath if it has been defined as column.
+ 2) **TagIndex** index value if within tag range.
+ 3) **Subpath**  defined subpath.
 
 
 ### Comments
 
 In order to skip loading line start line with // followed by some optional comments.
-
 
 <a name="Usage"></a>
 ## Usage 
@@ -728,17 +735,20 @@ In order to skip loading line start line with // followed by some optional comme
     var localAssetRepo, remoteAssetRepo string
 	dao := neatly.NewDao(localAssetRepo, remoteAssetRepo, "yyyy-MM-dd h:mm:ss", nil)
 	
-	var ufgNilFunction//
+	//user defined function
+	var nilUdf = fun(source interface{}, state data.Map) (interface{}, error) {
+		return nil, nil
+	}
 	
-	var context = data.NewMap()
-	context.Put("Nil", ufgNilFunction)
-    //register here udf where
-    
-    
+	var context = data.NewMap() //data is toolbox/data package
+	//optionally register UDF
+	context.Put("Nil", nilUdf)
     
 	var targetObject = &MyStruct{} // or map[string]interface{}
 	err := dao.Load(context, url.NewResource("mystruct.csv"), targetObject)
-
+    if err != nil {
+    	log.Fatal(err)
+    }
 
 
 ```
