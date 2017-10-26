@@ -719,7 +719,8 @@ thus they should be treated as reserved keyword,  unless object needs to expose 
 
 ### Comments
 
-In order to skip loading line start line with // followed by some optional comments.
+To prevent line loading into document , **//** can be used at the beginning of the line, optionally followed by some comments.  
+
 
 <a name="Usage"></a>
 ## Usage 
