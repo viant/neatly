@@ -195,10 +195,17 @@ func (d *Dao) processCell(context data.Map, ownerResource *url.Resource, record 
 	tagObject := processing.tagObject
 	rootObject := processing.rootObject
 	textValue := toolbox.AsString(value)
-	isReference := strings.HasPrefix(textValue, "%")
-	if isReference {
-		err := processing.referenceValues.Add(string(textValue[1:]), field, tagObject)
-		return recordHeight, err
+
+
+	if strings.HasPrefix(textValue, "%%") {//escape forward object tag reference
+		textValue = string(textValue[1:])
+
+	} else {
+		isReference := strings.HasPrefix(textValue, "%")
+		if isReference {
+			err := processing.referenceValues.Add(string(textValue[1:]), field, tagObject)
+			return recordHeight, err
+		}
 	}
 	val, err := d.normalizeValue(context, ownerResource, tag.Subpath, textValue, processing.virtualObjects)
 	if err != nil {
