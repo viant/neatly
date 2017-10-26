@@ -34,14 +34,16 @@ Neatly is a neat format for representing nested structured data, with simple tab
 
 Neatly use tabular format thus can be easily store as csv or other delimitered format,
 
-The first column in a row represent an **object tag**,  followed by columns to define this object fields.
+The first column in a row represent an **object tag**,  followed by columns defining the object fields.
 Next row/s would define object tag values, in this case the first column would be left empty.
-You can thing of an object tag as it is an object definition, whereas object values would creates one or more the object instances.
-Object tag can represents a single instance or an instance element wthin an array.
+You can thing of an object tag as it is an object definition, whereas object values would creates one or more object instances.
+An object tag can represents a single instance or an instance element wthin an array.
 In the latter case object tag would be created with **[]** prefix.
 
+The very first object tag in the document represent a **root object**, which can be mapped to either to user defined struct type or a simple map.  
 
-The field definition defines a path to the leaf object of an object tag..
+
+The field defines a path to the leaf object of an object tag.
 It can be prefixed with 
    1) **square bracket '[]'** to denote that field is an array, all rows below will be elements for the array, unless there is empty line
    2) **slash '/'** to denote that field belongs to root object rather then preceding tag object
