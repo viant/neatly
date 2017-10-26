@@ -227,7 +227,7 @@ func TestDao_LoadUseCase5(t *testing.T) {
 
 	for i := 1; i <= 5; i++ {
 		assert.Equal(t, useCase5.Repeated[i-1].Id, i)
-		assert.Equal(t, useCase5.Repeated[i-1].Name, fmt.Sprintf("Subject %02d", i))
+		assert.Equal(t, useCase5.Repeated[i-1].Name, fmt.Sprintf("Name %02d", i))
 	}
 }
 

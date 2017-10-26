@@ -15,6 +15,7 @@ import (
 //OwnerURL represewnt currently loading netly URL
 const OwnerURL = "ownerURL"
 const indexKey = "index"
+const tagKey = "tag"
 
 //Dao represents neatly data access object
 type Dao struct {
@@ -120,7 +121,7 @@ func (d *Dao) load(context data.Map, source *url.Resource, scanner *bufio.Scanne
 		var hasActiveIterator = tag.HasActiveIterator()
 		if hasActiveIterator {
 			context.Put(indexKey, tag.Iterator.Index())
-			line = d.expandIteratorIndex(context, line)
+			line = d.expandIteratorIndex(context, line, tag)
 		}
 		isHeaderLine := !strings.HasPrefix(line, ",")
 		decoder := d.factory.Create(strings.NewReader(line))
@@ -207,7 +208,7 @@ func (d *Dao) processCell(context data.Map, ownerResource *url.Resource, record 
 			return recordHeight, err
 		}
 	}
-	val, err := d.normalizeValue(context, ownerResource, tag.Subpath, textValue, processing.virtualObjects)
+	val, err := d.normalizeValue(context, ownerResource, tag, textValue, processing.virtualObjects)
 	if err != nil {
 		return recordHeight, fmt.Errorf("Failed to normalizeValue: %v, %v", textValue, err)
 	}
@@ -225,13 +226,13 @@ func (d *Dao) processCell(context data.Map, ownerResource *url.Resource, record 
 	}
 	field.Set(val, targetObject)
 	if field.HasArrayComponent {
-		recordHeight, err = d.processArrayValues(field, recordIndex, lines, record, targetObject, recordHeight, ownerResource, context, tag.Subpath)
+		recordHeight, err = d.processArrayValues(field, recordIndex, lines, record, targetObject, recordHeight, ownerResource, context, tag)
 	}
 	return recordHeight, err
 
 }
 
-func (d *Dao) processArrayValues(field *Field, recordIndex int, lines []string, record *toolbox.DelimiteredRecord, data data.Map, recordHeight int, ownerResource *url.Resource, context data.Map, subpath string) (int, error) {
+func (d *Dao) processArrayValues(field *Field, recordIndex int, lines []string, record *toolbox.DelimiteredRecord, data data.Map, recordHeight int, ownerResource *url.Resource, context data.Map, tag *Tag) (int, error) {
 	if field.HasArrayComponent {
 		var itemCount = 0
 		for k := recordIndex + 1; k < len(lines); k++ {
@@ -252,7 +253,7 @@ func (d *Dao) processArrayValues(field *Field, recordIndex int, lines []string, 
 				break
 			}
 			itemCount++
-			val, err := d.normalizeValue(context, ownerResource, subpath, toolbox.AsString(itemValue), nil)
+			val, err := d.normalizeValue(context, ownerResource, tag, toolbox.AsString(itemValue), nil)
 			if err != nil {
 				return 0, err
 			}
@@ -415,7 +416,7 @@ loadMap loads map for provided URI. If resource is a json or yaml object it will
 index parameters publishes $arg{index} or $args{index} additional key value pairs, the fist one has full content of the resource, the latter
 has removed the first and last character. This is to provide ability to substiture with entire json object including {} or just content of the json object.
 */
-func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, subpath, asset string, escapeQuotes bool, index int, virtualObjects data.Map) (data.Map, error) {
+func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, tag *Tag, asset string, escapeQuotes bool, index int, virtualObjects data.Map) (data.Map, error) {
 	var aMap = make(map[string]interface{})
 	var uriExtension string
 	var assetContent = asset
@@ -433,7 +434,7 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, subpath, as
 		}
 	} else if strings.HasPrefix(asset, "#") {
 		uriExtension = path.Ext(asset)
-		resource, err := d.getExternalResource(context, ownerResource, subpath, asset)
+		resource, err := d.getExternalResource(context, ownerResource, tag.Subpath, asset)
 		if err != nil {
 			return nil, err
 		}
@@ -443,7 +444,7 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, subpath, as
 		}
 	}
 
-	assetContent = d.expandIteratorIndex(context, assetContent)
+	assetContent = d.expandIteratorIndex(context, assetContent, tag)
 	assetContent = strings.Trim(assetContent, " \t\n\r")
 
 	if uriExtension == ".yaml" || uriExtension == ".yml" {
@@ -529,29 +530,31 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 	return value, nil
 }
 
-func (d *Dao) expandIteratorIndex(context data.Map, data string) string {
+func (d *Dao) expandIteratorIndex(context data.Map, data string, tag *Tag) string {
 	var index = context.GetString(indexKey)
 	data = strings.Replace(data, "${"+indexKey+"}", toolbox.AsString(index), len(data))
 	data = strings.Replace(data, "$"+indexKey, toolbox.AsString(index), len(data))
+	data = strings.Replace(data, "$tag", tag.Name, len(data))
+	data = strings.Replace(data, "${tag}", tag.Name, len(data))
 	return data
 }
 
-func (d *Dao) normalizeValue(context data.Map, ownerResource *url.Resource, subpath, value string, virtualObjects data.Map) (interface{}, error) {
+func (d *Dao) normalizeValue(context data.Map, ownerResource *url.Resource, tag *Tag, value string, virtualObjects data.Map) (interface{}, error) {
 	if strings.HasPrefix(value, "##") { //escape #
 		value = string(value[1:])
 	} else if strings.HasPrefix(value, "#") {
 		context.Put(OwnerURL, ownerResource.URL)
 
 		var assets = strings.Split(value, "|")
-		mainAsset, err := d.loadExternalResource(context, ownerResource, subpath, assets[0])
+		mainAsset, err := d.loadExternalResource(context, ownerResource, tag.Subpath, assets[0])
 		if err != nil {
 			return nil, err
 		}
 		mainAsset = strings.TrimSpace(mainAsset)
-		mainAsset = d.expandIteratorIndex(context, mainAsset)
+		mainAsset = d.expandIteratorIndex(context, mainAsset, tag)
 		escapeQuotes := strings.HasPrefix(mainAsset, "{") || strings.HasPrefix(mainAsset, "[")
 		for i := 1; i < len(assets); i++ {
-			aMap, err := d.loadMap(context, ownerResource, subpath, assets[i], escapeQuotes, i-1, virtualObjects)
+			aMap, err := d.loadMap(context, ownerResource, tag, assets[i], escapeQuotes, i-1, virtualObjects)
 			if err != nil {
 				return nil, err
 			}

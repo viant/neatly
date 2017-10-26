@@ -300,9 +300,9 @@ Neatly tabular representation.
 
 
 
-In this case Repeted tag uses expression in the {  } to define object tag range.
+In this case Repeted tag uses **Tag Range** expression  **{  }**, which repeats all value rows as (max - min) from the range. 
 
-Index is a special/reserved keyword in this context it would expand to 01 in the firs iteration followed by 02, 03, 04 and 05.
+'$index' / ${index} is a special/reserved keyword in this context it would expand to 01 in the firs iteration followed by 02, 03, 04 and 05.
 If there are more than one value row, all can be expanded to the same index value within the same iteration.
 
 
@@ -310,6 +310,7 @@ Note that number of digits in the upper bound range value creates a padding temp
 1 .. 010 -> would '0' left pad an index to 3 digits
 1 .. 00100 -> would '0' left pad an index to 5 digits.
 
+'${tag}' is also special reserved keyword which expands to the current object tag.
 
 ### Data delegation and loading external resources use case
 
@@ -714,7 +715,7 @@ thus they should be treated as reserved keyword,  unless object needs to expose 
 
  1) **Tag** name of currently processing tag.
  2) **TagIndex** index value if within tag range.
- 3) **Subpath**  defined subpath.
+ 3) **Subpath**  defines subpath.
 
 
 ### Comments
