@@ -302,7 +302,9 @@ Neatly tabular representation.
 
 In this case Repeted tag uses **Tag Range** expression  **{  }**, which repeats all value rows as (max - min) from the range. 
 
-'$index' / ${index} is a special/reserved keyword in this context it would expand to 01 in the firs iteration followed by 02, 03, 04 and 05.
+#### Variable substitution
+
+**$index** / ${index} is a special/reserved keyword in this context it would expand to 01 in the firs iteration followed by 02, 03, 04 and 05.
 If there are more than one value row, all can be expanded to the same index value within the same iteration.
 
 
@@ -310,7 +312,9 @@ Note that number of digits in the upper bound range value creates a padding temp
 1 .. 010 -> would '0' left pad an index to 3 digits
 1 .. 00100 -> would '0' left pad an index to 5 digits.
 
-'${tag}' is also special reserved keyword which expands to the current object tag.
+**$tag**  expands to the current object tag.
+
+**$tagId** expands to current root object Name if specified, followed by object tag, object tag index, and subpath if specified.
 
 ### Data delegation and loading external resources use case
 
@@ -588,7 +592,7 @@ Neatly tabular alternative representation.
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
 | **[]UseCases{1..2}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
-| | usecase9/${index} / | $index | \#useCase.json |  \#customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
+| | usecase9/${index} / | $index | \#use_case.txt |  \#customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
 
 
 Where
@@ -621,6 +625,48 @@ The following special variables are available for substitution:
   2) $arg{index} - full piping content.
      
   Where  index corresponds to piping number starting with 0 
+
+
+### Dynamic subpath discovery 
+
+Subpath can use '*' as suffix to dynamically discover actual supath directory 
+
+
+Take as example the following
+
+Neatly tabular alternative representation.
+
+| Root | UseCases | | | | 
+| --- | --- | --- | --- | --- |
+|  |%UseCases | | | |
+| **[]UseCases{1..2}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
+| | usecase10/${index}* / | $index | \#use_case.txt |  \#customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
+
+
+
+
+Where
+
+
+\#usecase10/001_description1/customer.json
+```json
+{
+   "ID": 1,
+   "NAME": "Smith",
+   $args0
+}
+```
+
+
+
+\#usecase10/002_description2/customer.json
+```json
+{
+  "ID": 2,
+  "NAME": "Kowalczyk",
+   $args0
+}
+```
 
 
 ### User defined functions (udf)

@@ -14,8 +14,6 @@ import (
 
 //OwnerURL represewnt currently loading netly URL
 const OwnerURL = "ownerURL"
-const indexKey = "index"
-const tagKey = "tag"
 
 //Dao represents neatly data access object
 type Dao struct {
@@ -59,73 +57,71 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
-func (d *Dao) processTag(tag *Tag, parentObject data.Map, reference referenceValues) (err error) {
-	if parentObject.Has(tag.Name) {
+func (d *Dao) processTag(context *tagContext) (err error) {
+
+	if context.objectContainer.Has(context.tag.Name) {
 		return nil
 	}
-	if tag.IsArray {
+	if context.tag.IsArray {
 		var collection = data.NewCollection()
-		parentObject.Put(tag.Name, collection)
-		err = reference.Apply(tag.Name, collection)
+		context.objectContainer.Put(context.tag.Name, collection)
+		err = context.referenceValues.Apply(context.tag.Name, collection)
 	} else {
 		var object = make(map[string]interface{})
-		parentObject.Put(tag.Name, object)
-		err = reference.Apply(tag.Name, object)
+		context.objectContainer.Put(context.tag.Name, object)
+		err = context.referenceValues.Apply(context.tag.Name, object)
 	}
 	return err
 }
 
 //processHeaderLine extract from LineNumber a tag from column[0], add deferredRefences for a tag, decodes fields from remaining column,
-func (d *Dao) processHeaderLine(parentObject data.Map, decoder toolbox.Decoder, referenceValues referenceValues, lineNumber int) (*toolbox.DelimiteredRecord, *Tag, error) {
+func (d *Dao) processHeaderLine(context *tagContext, decoder toolbox.Decoder, lineNumber int) (*toolbox.DelimiteredRecord, *Tag, error) {
 	record := &toolbox.DelimiteredRecord{Delimiter: ","}
 	err := decoder.Decode(record)
 	if err != nil {
 		return nil, nil, err
 	}
-	tag := NewTag(record.Columns[0], lineNumber)
-
-	err = d.processTag(tag, parentObject, referenceValues)
+	ownerName := context.rootObject.GetString("Name")
+	context.tag = NewTag(ownerName, context.source, record.Columns[0], lineNumber)
+	err = d.processTag(context)
 	if err != nil {
 		return nil, nil, err
 	}
-	return record, tag, nil
+	return record, context.tag, nil
 }
 
 //processHeaderLine extract from LineNumber a tag from column[0], add deferredRefences for a tag, decodes fields from remaining column,
-func (d *Dao) processRootHeaderLine(objectContainer data.Map, decoder toolbox.Decoder) (*toolbox.DelimiteredRecord, *Tag, error) {
+func (d *Dao) processRootHeaderLine(source *url.Resource, objectContainer data.Map, decoder toolbox.Decoder) (*toolbox.DelimiteredRecord, *Tag, error) {
 	record := &toolbox.DelimiteredRecord{Delimiter: ","}
 	err := decoder.Decode(record)
 	if err != nil {
 		return nil, nil, err
 	}
-	tag := NewTag(record.Columns[0], 0)
+	tag := NewTag("", source, record.Columns[0], 0)
 	var object = make(map[string]interface{})
 	objectContainer.Put(tag.Name, object)
 	return record, tag, nil
 }
 
 //load loads source using nearly format.
-func (d *Dao) load(context data.Map, source *url.Resource, scanner *bufio.Scanner) (map[string]interface{}, error) {
+func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio.Scanner) (map[string]interface{}, error) {
 	var objectContainer = data.NewMap()
 	var referenceValues = newReferenceValues()
 	lines := readLines(scanner)
 	decoder := d.factory.Create(strings.NewReader(lines[0]))
-	record, tag, err := d.processRootHeaderLine(objectContainer, decoder)
+	record, tag, err := d.processRootHeaderLine(source, objectContainer, decoder)
 	if err != nil {
 		return nil, err
 	}
 	var rootObject = objectContainer.GetMap(tag.Name)
+	var context = newTagContext(loadingContext, source, tag, objectContainer, referenceValues, rootObject, rootObject)
 	for i := 1; i < len(lines); i++ {
 		var recordHeight = 0
 		line := lines[i]
 		var hasActiveIterator = tag.HasActiveIterator()
-		if hasActiveIterator {
-			context.Put(indexKey, tag.Iterator.Index())
-			line = d.expandIteratorIndex(context, line, tag)
-		}
+		line = d.expandMeta(context, line)
 		isHeaderLine := !strings.HasPrefix(line, ",")
 		decoder := d.factory.Create(strings.NewReader(line))
-
 		if isHeaderLine {
 			if hasActiveIterator {
 				if tag.Iterator.Next() {
@@ -133,7 +129,7 @@ func (d *Dao) load(context data.Map, source *url.Resource, scanner *bufio.Scanne
 					continue
 				}
 			}
-			record, tag, err = d.processHeaderLine(objectContainer, decoder, referenceValues, i)
+			record, tag, err = d.processHeaderLine(context, decoder, i)
 			if err != nil {
 				return nil, err
 			}
@@ -146,16 +142,15 @@ func (d *Dao) load(context data.Map, source *url.Resource, scanner *bufio.Scanne
 		}
 
 		if !record.IsEmpty() {
-			tagObject := tag.getObject(objectContainer, record.Record)
-			var processingObject = newProcessingObject(tag, referenceValues, rootObject, tagObject)
+			tag.setTagObject(context, record.Record)
 
 			for j := 1; j < len(record.Columns); j++ {
-				if recordHeight, err = d.processCell(context, source, record, lines, i, j, processingObject, recordHeight, true); err != nil {
+				if recordHeight, err = d.processCell(context,  record, lines, i, j, recordHeight, true); err != nil {
 					return nil, err
 				}
 			}
 			for j := 1; j < len(record.Columns); j++ {
-				if recordHeight, err = d.processCell(context, source, record, lines, i, j, processingObject, recordHeight, false); err != nil {
+				if recordHeight, err = d.processCell(context,  record, lines, i, j, recordHeight, false); err != nil {
 					return nil, err
 				}
 			}
@@ -164,6 +159,7 @@ func (d *Dao) load(context data.Map, source *url.Resource, scanner *bufio.Scanne
 		i += recordHeight
 		var isLast = i+1 == len(lines)
 		if isLast && tag.HasActiveIterator() {
+
 			if tag.Iterator.Next() {
 				i = tag.LineNumber
 				continue
@@ -177,7 +173,7 @@ func (d *Dao) load(context data.Map, source *url.Resource, scanner *bufio.Scanne
 	return rootObject, nil
 }
 
-func (d *Dao) processCell(context data.Map, ownerResource *url.Resource, record *toolbox.DelimiteredRecord, lines []string, recordIndex, columnIndex int, processing *processingObject, recordHeight int, virtual bool) (int, error) {
+func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord, lines []string, recordIndex, columnIndex int, recordHeight int, virtual bool) (int, error) {
 	fieldExpression := record.Columns[columnIndex]
 	if fieldExpression == "" {
 		return recordHeight, nil
@@ -192,25 +188,23 @@ func (d *Dao) processCell(context data.Map, ownerResource *url.Resource, record 
 		return recordHeight, nil
 	}
 
-	tag := processing.tag
-	tagObject := processing.tagObject
-	rootObject := processing.rootObject
+
+	tagObject := context.tagObject
+	rootObject := context.rootObject
 	textValue := toolbox.AsString(value)
 
-
-	if strings.HasPrefix(textValue, "%%") {//escape forward object tag reference
+	if strings.HasPrefix(textValue, "%%") { //escape forward object tag reference
 		textValue = string(textValue[1:])
-
 	} else {
 		isReference := strings.HasPrefix(textValue, "%")
 		if isReference {
-			err := processing.referenceValues.Add(string(textValue[1:]), field, tagObject)
+			err := context.referenceValues.Add(string(textValue[1:]), field, tagObject)
 			return recordHeight, err
 		}
 	}
-	val, err := d.normalizeValue(context, ownerResource, tag, textValue, processing.virtualObjects)
+	val, err := d.normalizeValue(context, textValue)
 	if err != nil {
-		return recordHeight, fmt.Errorf("Failed to normalizeValue: %v, %v", textValue, err)
+		return recordHeight, fmt.Errorf("%v - failed to normalizeValue %v, %v", context.tag.TagId(), textValue, err)
 	}
 
 	var targetObject data.Map
@@ -220,19 +214,19 @@ func (d *Dao) processCell(context data.Map, ownerResource *url.Resource, record 
 	}
 
 	if field.IsVirtual {
-		targetObject = processing.virtualObjects
+		targetObject = context.virtualObjects
 	} else {
 		targetObject = tagObject
 	}
 	field.Set(val, targetObject)
 	if field.HasArrayComponent {
-		recordHeight, err = d.processArrayValues(field, recordIndex, lines, record, targetObject, recordHeight, ownerResource, context, tag)
+		recordHeight, err = d.processArrayValues(context, field, recordIndex, lines, record, targetObject, recordHeight)
 	}
 	return recordHeight, err
 
 }
 
-func (d *Dao) processArrayValues(field *Field, recordIndex int, lines []string, record *toolbox.DelimiteredRecord, data data.Map, recordHeight int, ownerResource *url.Resource, context data.Map, tag *Tag) (int, error) {
+func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex int, lines []string, record *toolbox.DelimiteredRecord, data data.Map, recordHeight int) (int, error) {
 	if field.HasArrayComponent {
 		var itemCount = 0
 		for k := recordIndex + 1; k < len(lines); k++ {
@@ -253,7 +247,7 @@ func (d *Dao) processArrayValues(field *Field, recordIndex int, lines []string, 
 				break
 			}
 			itemCount++
-			val, err := d.normalizeValue(context, ownerResource, tag, toolbox.AsString(itemValue), nil)
+			val, err := d.normalizeValue(context, toolbox.AsString(itemValue))
 			if err != nil {
 				return 0, err
 			}
@@ -319,41 +313,41 @@ getExternalResource returns resource for provided asset URI. This function tries
 	c) Local/remoteResourceRepo and asset name
 
 */
-func (d *Dao) getExternalResource(context data.Map, owner *url.Resource, subpath, URI string) (*url.Resource, error) {
+func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resource, error) {
 	if URI == "" {
 		return nil, fmt.Errorf("Resource was empty")
 	}
 	if strings.Contains(URI, "://") || strings.HasPrefix(URI, "/") {
-		return url.NewResource(URI, owner.Credential), nil
+		return url.NewResource(URI, context.source.Credential), nil
 	}
 	if strings.HasPrefix(URI, "#") {
 		URI = string(URI[1:])
 	}
 
-	ownerURL, URL := buildURLWithOwnerURL(owner, subpath, URI)
+	ownerURL, URL := buildURLWithOwnerURL(context.source, context.tag.Subpath, URI)
 
-	service, err := storage.NewServiceForURL(URL, owner.Credential)
+	service, err := storage.NewServiceForURL(URL, context.source.Credential)
 	if err != nil {
 		return nil, err
 	}
 	exists, err := service.Exists(URL)
 	if !exists {
 		if d.remoteResourceRepo != "" {
-			fallbackResource, err := d.NewRepoResource(context, URI)
+			fallbackResource, err := d.NewRepoResource(context.context, URI)
 			if err == nil {
-				service, _ = storage.NewServiceForURL(fallbackResource.URL, owner.Credential)
+				service, _ = storage.NewServiceForURL(fallbackResource.URL, context.source.Credential)
 				if exists, _ = service.Exists(fallbackResource.URL); exists {
 					URL = fallbackResource.URL
 
 				}
 			}
 		}
-		if !exists && subpath != "" {
-			fileCandidate := path.Join(ownerURL, subpath, URI)
+		if !exists && context.tag.Subpath != "" {
+			fileCandidate := path.Join(ownerURL,  context.tag.Subpath, URI)
 			URL = toolbox.FileSchema + fileCandidate
 		}
 	}
-	return url.NewResource(URL, owner.Credential), nil
+	return url.NewResource(URL, context.source.Credential), nil
 }
 
 //buildURLWithOwnerURL builds owner URL and candidate URL based on owner url, subpath if not empty, and URI
@@ -416,7 +410,8 @@ loadMap loads map for provided URI. If resource is a json or yaml object it will
 index parameters publishes $arg{index} or $args{index} additional key value pairs, the fist one has full content of the resource, the latter
 has removed the first and last character. This is to provide ability to substiture with entire json object including {} or just content of the json object.
 */
-func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, tag *Tag, asset string, escapeQuotes bool, index int, virtualObjects data.Map) (data.Map, error) {
+func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, index int) (data.Map, error) {
+	virtualObjects := context.virtualObjects
 	var aMap = make(map[string]interface{})
 	var uriExtension string
 	var assetContent = asset
@@ -434,7 +429,7 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, tag *Tag, a
 		}
 	} else if strings.HasPrefix(asset, "#") {
 		uriExtension = path.Ext(asset)
-		resource, err := d.getExternalResource(context, ownerResource, tag.Subpath, asset)
+		resource, err := d.getExternalResource(context, asset)
 		if err != nil {
 			return nil, err
 		}
@@ -444,7 +439,7 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, tag *Tag, a
 		}
 	}
 
-	assetContent = d.expandIteratorIndex(context, assetContent, tag)
+	assetContent = d.expandMeta(context, assetContent)
 	assetContent = strings.Trim(assetContent, " \t\n\r")
 
 	if uriExtension == ".yaml" || uriExtension == ".yml" {
@@ -455,7 +450,11 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, tag *Tag, a
 	} else if strings.HasPrefix(assetContent, "{") {
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(assetContent)).Decode(&aMap)
 		if err != nil {
-			return nil, err
+			assetContentLength := len(assetContent)
+			if assetContentLength > 50 {
+				assetContentLength = 50
+			}
+			return nil, fmt.Errorf("Failed to decode json:%v, %v", string(assetContent[:assetContentLength]), err)
 		}
 	}
 	if escapeQuotes {
@@ -488,8 +487,8 @@ func (d *Dao) loadMap(context data.Map, ownerResource *url.Resource, tag *Tag, a
 	return data.Map(aMap), nil
 }
 
-func (d *Dao) loadExternalResource(context data.Map, ownerResource *url.Resource, subpath, assetURI string) (string, error) {
-	resource, err := d.getExternalResource(context, ownerResource, subpath, assetURI)
+func (d *Dao) loadExternalResource(context *tagContext,  assetURI string) (string, error) {
+	resource, err := d.getExternalResource(context, assetURI)
 	var result string
 	if err == nil {
 		result, err = resource.DownloadText()
@@ -530,31 +529,33 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 	return value, nil
 }
 
-func (d *Dao) expandIteratorIndex(context data.Map, data string, tag *Tag) string {
-	var index = context.GetString(indexKey)
-	data = strings.Replace(data, "${"+indexKey+"}", toolbox.AsString(index), len(data))
-	data = strings.Replace(data, "$"+indexKey, toolbox.AsString(index), len(data))
-	data = strings.Replace(data, "$tag", tag.Name, len(data))
-	data = strings.Replace(data, "${tag}", tag.Name, len(data))
-	return data
+func (d *Dao) expandMeta(context *tagContext, text string) string {
+	var replacementMap = data.NewMap()
+	replacementMap.Put("tagId", context.tag.TagId())
+	replacementMap.Put("tag", context.tag.Name)
+	if context.tag.HasActiveIterator() {
+		replacementMap.Put("index", context.tag.Iterator.Index())
+	}
+	return replacementMap.ExpandAsText(text)
 }
 
-func (d *Dao) normalizeValue(context data.Map, ownerResource *url.Resource, tag *Tag, value string, virtualObjects data.Map) (interface{}, error) {
+func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, error) {
+	virtualObjects := context.virtualObjects
 	if strings.HasPrefix(value, "##") { //escape #
 		value = string(value[1:])
 	} else if strings.HasPrefix(value, "#") {
-		context.Put(OwnerURL, ownerResource.URL)
+		context.context.Put(OwnerURL, context.source.URL)
 
 		var assets = strings.Split(value, "|")
-		mainAsset, err := d.loadExternalResource(context, ownerResource, tag.Subpath, assets[0])
+		mainAsset, err := d.loadExternalResource(context, assets[0])
 		if err != nil {
 			return nil, err
 		}
 		mainAsset = strings.TrimSpace(mainAsset)
-		mainAsset = d.expandIteratorIndex(context, mainAsset, tag)
+		mainAsset = d.expandMeta(context, mainAsset)
 		escapeQuotes := strings.HasPrefix(mainAsset, "{") || strings.HasPrefix(mainAsset, "[")
 		for i := 1; i < len(assets); i++ {
-			aMap, err := d.loadMap(context, ownerResource, tag, assets[i], escapeQuotes, i-1, virtualObjects)
+			aMap, err := d.loadMap(context, assets[i], escapeQuotes, i-1)
 			if err != nil {
 				return nil, err
 			}
@@ -565,7 +566,7 @@ func (d *Dao) normalizeValue(context data.Map, ownerResource *url.Resource, tag 
 
 	result, err := d.asDataStructure(value)
 	if err == nil {
-		result = context.Expand(result)
+		result = context.context.Expand(result)
 		if len(virtualObjects) > 0 {
 			result = virtualObjects.Expand(result)
 		}
@@ -587,17 +588,23 @@ func NewDao(localResourceRepo, remoteResourceRepo, dataFormat string, delimiterD
 	}
 }
 
-type processingObject struct {
-	tag             *Tag
+type tagContext struct {
+	source          *url.Resource
+	context         data.Map
 	referenceValues referenceValues
+	objectContainer data.Map
 	rootObject      data.Map
+	tag             *Tag
 	tagObject       data.Map
 	virtualObjects  data.Map
 }
 
-func newProcessingObject(tag *Tag, referenceValues referenceValues, rootObject data.Map, tagObject data.Map) *processingObject {
-	return &processingObject{
+func newTagContext(context data.Map, source *url.Resource, tag *Tag, objectContainer data.Map, referenceValues referenceValues, rootObject data.Map, tagObject data.Map) *tagContext {
+	return &tagContext{
+		source:          source,
+		context:         context,
 		tag:             tag,
+		objectContainer: objectContainer,
 		referenceValues: referenceValues,
 		rootObject:      rootObject,
 		tagObject:       tagObject,
