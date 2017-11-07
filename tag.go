@@ -8,6 +8,7 @@ import (
 	"strings"
 	"github.com/viant/toolbox/storage"
 	"path"
+	"unicode"
 )
 
 //Tag represents a nearly tag
@@ -89,6 +90,7 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	if t.Subpath != "" {
 		object["Subpath"] = t.Subpath
 	}
+	object["TagId"] = t.TagId()
 }
 
 func (t *Tag) TagId() string {
@@ -96,7 +98,14 @@ func (t *Tag) TagId() string {
 	if t.HasActiveIterator() {
 		index  = t.Iterator.Index()
 	}
-	return fmt.Sprintf(t.TagIdTemplate, index, t.Subpath)
+	value:=fmt.Sprintf(t.TagIdTemplate, index, t.Subpath)
+	var result  = make([]byte, 0)
+	for _, r := range value {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			result = append(result, byte(r))
+		}
+	}
+	return string(result)
 }
 
 

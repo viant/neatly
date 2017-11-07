@@ -140,8 +140,8 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		if err != nil {
 			return nil, err
 		}
-
 		if !record.IsEmpty() {
+			context.virtualObjects = data.NewMap()
 			tag.setTagObject(context, record.Record)
 
 			for j := 1; j < len(record.Columns); j++ {

@@ -760,6 +760,7 @@ For every object the following attributes will be set as object values,
 thus they should be treated as reserved keyword,  unless object needs to expose them.
 
  1) **Tag** name of currently processing tag.
+ 1) **TagId** tag id of currently processing tag.
  2) **TagIndex** index value if within tag range.
  3) **Subpath**  defines subpath.
 
