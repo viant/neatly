@@ -388,7 +388,7 @@ func (d *Dao) NewRepoResource(context data.Map, URI string) (*url.Resource, erro
 	if err != nil {
 		return nil, err
 	}
-	err = storage.Copy(remoteService, remoteResourceURL, localService, localResourceURL, nil)
+	err = storage.Copy(remoteService, remoteResourceURL, localService, localResourceURL, nil, nil)
 	return localResource, err
 }
 
