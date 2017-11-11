@@ -4,6 +4,7 @@ import (
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"strings"
+	"unicode"
 )
 
 //Field represent field of object
@@ -96,7 +97,10 @@ func NewField(expression string) *Field {
 	if isVirtual {
 		parsedExpression = string(parsedExpression[1:])
 	}
-
+	runes := []rune(expression)
+	if unicode.IsLower(runes[0]) {
+		isVirtual = true
+	}
 	var result = &Field{
 		expression:        expression,
 		HasArrayComponent: strings.Contains(parsedExpression, "[]"),

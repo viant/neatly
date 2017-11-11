@@ -36,18 +36,22 @@ Neatly use tabular format thus can be easily store as csv or other delimitered f
 
 The first column in a row represent an **object tag**,  followed by columns defining the object fields.
 Next row/s would define object tag values, in this case the first column would be left empty.
-You can thing of an object tag as it is an object definition, whereas object values would creates one or more object instances.
+You can think of an object tag as it is an object definition, whereas object values would creates one or more object instances.
 An object tag can represents a single instance or an instance element wthin an array.
 In the latter case object tag would be created with **[]** prefix.
 
 The very first object tag in the document represent a **root object**, which can be mapped to either to user defined struct type or a simple map.  
 
 
+
 The field defines a path to the leaf object of an object tag.
+
+Field name should start with uppercase letter in order to map to undelying datastructure.
+
 It can be prefixed with 
    1) **square bracket '[]'** to denote that field is an array, all rows below will be elements for the array, unless there is empty line
    2) **slash '/'** to denote that field belongs to root object rather then preceding tag object
-   3) **colon ':'**  to denote that field of a virtual object that can be used as data substitution with dollar($) sign expression.
+   3) **colon ':'**  or expression stating with **lowercase** character denotes a virtual object field that can be used as data substitution with dollar($) sign expression.
    
 On top of that field definition can use dot (.) to define nested object of object or array type. 
 For instance 
@@ -248,7 +252,7 @@ Op top of that bonus value uses json notation, which may not be too elegant.
 | Root|	Merits | Created | | | | |
 | --- | --- | --- | --- | --- | --- | --- |
 | |	%Merits| 2017-10-10 | | |  |  | 
-|**[]Merits**|**Empno**| **Description** | **/[]Bonus** | **:emp.EmpNo** | **:emp.Name** | **:emp.Amount** |
+|**[]Merits**|**Empno**| **Description** | **/[]Bonus** | **emp.EmpNo** | **emp.Name** | **:emp.Amount** |
 | |	$emp.EmpNo |	Increased sales by 400% | $emp |	 1 | Smith | 10000  |
 | |	$emp.EmpNo |	Reduced cost by 30% | $emp | 2 |  Kowalczyk | 8000 |
 | |	$emp.EmpNo |	Improved resource reusibility by 40% | $emp | 3 | Schmidt |4000 |

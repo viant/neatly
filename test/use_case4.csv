@@ -1,6 +1,6 @@
 Root,Merits,,Created,,,
 ,%Merits,,2017-10-10,,,
-[]Merits,Empno,Description,/[]Bonus,:emp.EmpNo,:emp.Name,:emp.Amount
+[]Merits,Empno,Description,/[]Bonus,emp.EmpNo,emp.Name,:emp.Amount
 ,$emp.EmpNo,Increase sales by 400%,$emp,1,Smith,10000
 ,$emp.EmpNo,Reduced cost by 30%,$emp,2,Kowalczyk,8000
 ,$emp.EmpNo,Improve resource reusibility by 40%,$emp,3,Schmidt,4000
