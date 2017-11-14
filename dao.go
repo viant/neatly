@@ -533,6 +533,8 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 	var replacementMap = data.NewMap()
 	replacementMap.Put("tagId", context.tag.TagId())
 	replacementMap.Put("tag", context.tag.Name)
+	replacementMap.Put("subPath", context.tag.Subpath)
+
 	if context.tag.HasActiveIterator() {
 		replacementMap.Put("index", context.tag.Iterator.Index())
 	}

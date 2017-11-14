@@ -320,6 +320,9 @@ Note that number of digits in the upper bound range value creates a padding temp
 
 **$tagId** expands to current root object Name if specified, followed by object tag, object tag index, and subpath if specified.
 
+**$subPath** expands to current subPath if specified for the tag
+
+
 ### Data delegation and loading external resources use case
 
 
