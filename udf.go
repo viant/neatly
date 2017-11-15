@@ -9,6 +9,7 @@ import (
 	"io"
 	"path"
 	"strings"
+	"os"
 )
 
 //AsMap converts source into map
@@ -72,4 +73,25 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 	filename := path.Join(parentDirecotry, toolbox.AsString(source))
 	var result = toolbox.FileExists(filename)
 	return result, nil
+}
+
+
+//WorkingDirectory return joined path with current directory, ../ is supported as subpath
+func WorkingDirectory(source interface{}, state data.Map) (interface{}, error) {
+	currentDirectory, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	var subPath = toolbox.AsString(source)
+
+
+	for strings.HasSuffix(subPath, "../") {
+		currentDirectory, _ = path.Split(currentDirectory)
+		if len(subPath) == 3 {
+			subPath = ""
+		} else {
+			subPath = string(subPath[3:])
+		}
+	}
+	return path.Join(currentDirectory, subPath), nil
 }

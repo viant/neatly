@@ -49,6 +49,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 //AddStandardUdf register building udf to the context
 func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("AsMap", AsMap)
+	context.Put("WorkingDirectory", WorkingDirectory)
 	context.Put("AsInt", AsInt)
 	context.Put("AsFloat", AsFloat)
 	context.Put("AsBool", AsBool)

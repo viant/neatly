@@ -698,6 +698,7 @@ Builtin udf's
 4) AsBool 
 5) HasResource returns true if external resource exists
 6) Md5 generates md5 for provided parameter
+7) WorkingDirectory returns working directory joined with supplied sub path,  '../' is supported.
 
 
 ### External resources loading with virtual object value substitution use case.
