@@ -544,27 +544,37 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 
 func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, error) {
 	virtualObjects := context.virtualObjects
+	var assets []string
 	if strings.HasPrefix(value, "##") { //escape #
 		value = string(value[1:])
 	} else if strings.HasPrefix(value, "#") {
 		context.context.Put(OwnerURL, context.source.URL)
+		assets= strings.Split(value, "|")
 
-		var assets = strings.Split(value, "|")
 		mainAsset, err := d.loadExternalResource(context, assets[0])
 		if err != nil {
 			return nil, err
 		}
 		mainAsset = strings.TrimSpace(mainAsset)
 		mainAsset = d.expandMeta(context, mainAsset)
-		escapeQuotes := strings.HasPrefix(mainAsset, "{") || strings.HasPrefix(mainAsset, "[")
+		value = mainAsset
+	}
+
+
+	if len(assets) == 0 && strings.Contains(value, "|") && strings.HasPrefix(value, "[") {
+		assets = strings.Split(value, "|")
+	}
+
+	if len(assets) > 1 {
+		escapeQuotes := strings.HasPrefix(value, "{") || strings.HasPrefix(value, "[")
 		for i := 1; i < len(assets); i++ {
 			aMap, err := d.loadMap(context, assets[i], escapeQuotes, i-1)
 			if err != nil {
 				return nil, err
 			}
-			mainAsset = aMap.ExpandAsText(mainAsset)
+			value = aMap.ExpandAsText(value)
 		}
-		value = mainAsset
+		value = value
 	}
 
 	result, err := d.asDataStructure(value)
