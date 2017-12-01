@@ -19,8 +19,8 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 # Motivation 
 
 Most of the data-driven application use extensively nested structured data to instruct how the application should behave.
-There is various data format that comes here handy like vanilla CSV, XML, JSON, YAML which are more or less human-friendly. 
-It is however felt hat once the data grows organizing it with these formats becomes the mundane task.
+There is various data format that comes handy like vanilla CSV, XML, JSON, YAML which are more or less human-friendly. 
+Once the data grows, organizing it with these formats becomes the mundane task.
 As a matter of fact, in the absence of UI or/and data store (either RDBMS or NoSQL) data organization is challenging.
 Neatly has been designing in mind to address all these concerns promoting flexibility, reusability, data cohesion, delegation 
 and data organization
