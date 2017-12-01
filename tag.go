@@ -1,13 +1,13 @@
 package neatly
 
 import (
+	"fmt"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
-	"github.com/viant/toolbox/url"
-	"fmt"
-	"strings"
 	"github.com/viant/toolbox/storage"
+	"github.com/viant/toolbox/url"
 	"path"
+	"strings"
 	"unicode"
 )
 
@@ -45,7 +45,7 @@ func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}) d
 }
 
 func (t *Tag) expandPathIfNeeded(subpath string) string {
-	if ! strings.HasSuffix(subpath, "*") {
+	if !strings.HasSuffix(subpath, "*") {
 		return subpath
 	}
 	subPathElements := strings.Split(subpath, "/")
@@ -76,7 +76,6 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 	return subpath
 }
 
-
 //setMeta sets Tag, optionally TagIndex and Subpath to the provided object
 func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	object["Tag"] = t.Name
@@ -96,10 +95,10 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 func (t *Tag) TagId() string {
 	var index = ""
 	if t.HasActiveIterator() {
-		index  = t.Iterator.Index()
+		index = t.Iterator.Index()
 	}
-	value:=fmt.Sprintf(t.TagIdTemplate, index, t.Subpath)
-	var result  = make([]byte, 0)
+	value := fmt.Sprintf(t.TagIdTemplate, index, t.Subpath)
+	var result = make([]byte, 0)
 	for _, r := range value {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			result = append(result, byte(r))
@@ -108,14 +107,13 @@ func (t *Tag) TagId() string {
 	return string(result)
 }
 
-
 //NewTag creates a new neatly tag
 func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber int) *Tag {
 	var result = &Tag{
-		OwnerName:     ownerName,
-		OwnerSource:   ownerSource,
-		Name:          key,
-		LineNumber:    lineNumber,
+		OwnerName:   ownerName,
+		OwnerSource: ownerSource,
+		Name:        key,
+		LineNumber:  lineNumber,
 	}
 	key = decodeIteratorIfPresent(key, result)
 	if string(key[0:2]) == "[]" {

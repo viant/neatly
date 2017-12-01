@@ -41,7 +41,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 
 	var sourceMap = make(map[string]interface{})
 
-	err = d.converter.AssignConverted(&sourceMap, source);
+	err = d.converter.AssignConverted(&sourceMap, source)
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		}
 
 		i += recordHeight
-		var isLast = i + 1 == len(lines)
+		var isLast = i+1 == len(lines)
 		if isLast && tag.HasActiveIterator() {
 
 			if tag.Iterator.Next() {
@@ -496,7 +496,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent) - 1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -517,11 +517,11 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1: len(value) - 1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1: len(value) - 1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {
@@ -579,7 +579,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 	if len(assets) > 1 {
 		escapeQuotes := strings.HasPrefix(value, "{") || strings.HasPrefix(value, "[")
 		for i := 1; i < len(assets); i++ {
-			aMap, err := d.loadMap(context, assets[i], escapeQuotes, i - 1)
+			aMap, err := d.loadMap(context, assets[i], escapeQuotes, i-1)
 			if err != nil {
 				return nil, err
 			}

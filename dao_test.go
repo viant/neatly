@@ -448,14 +448,11 @@ func TestDao_LoadUseCase10(t *testing.T) {
 
 }
 
-
-
 func TestDao_LoadUseCase11(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case11.csv"), useCase7)
-
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(useCase7.UseCases))
@@ -492,15 +489,11 @@ func TestDao_LoadUseCase11(t *testing.T) {
 
 }
 
-
-
-
 func TestDao_LoadUseCase12(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case12.csv"), useCase7)
-
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(useCase7.UseCases))

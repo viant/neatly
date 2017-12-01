@@ -3,12 +3,12 @@ package neatly_test
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/neatly"
-	"testing"
 	"github.com/viant/toolbox/url"
+	"testing"
 )
 
 func Test_Tag(t *testing.T) {
-	var tag = neatly.NewTag("",  url.NewResource("test"),"[]Test{1 .. 003}", 1)
+	var tag = neatly.NewTag("", url.NewResource("test"), "[]Test{1 .. 003}", 1)
 	assert.True(t, tag.IsArray)
 	assert.Equal(t, "Test", tag.Name)
 	assert.Equal(t, 1, tag.Iterator.Min)

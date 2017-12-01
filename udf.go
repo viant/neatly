@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
+	"github.com/viant/toolbox/url"
 	"io"
+	"os"
 	"path"
 	"strings"
-	"os"
-	"github.com/viant/toolbox/url"
 )
 
 //AsMap converts source into map
@@ -57,7 +57,7 @@ func Md5(source interface{}, state data.Map) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result =  fmt.Sprintf("%x", hash.Sum(nil))
+	var result = fmt.Sprintf("%x", hash.Sum(nil))
 	return result, nil
 }
 
@@ -69,18 +69,15 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 		parentDirecotry, _ = path.Split(workflowPath)
 	}
 
-
-
 	filename := path.Join(parentDirecotry, toolbox.AsString(source))
 	var result = toolbox.FileExists(filename)
 	return result, nil
 }
 
-
 //LoadNeatly loads neatly document as data structure, source represents path to nearly document
 func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	var filename = toolbox.AsString(source)
-	if ! strings.HasPrefix(filename, "/") {
+	if !strings.HasPrefix(filename, "/") {
 		var parentDirecotry = ""
 		if state.Has(OwnerURL) {
 			var workflowPath = strings.Replace(state.GetString(OwnerURL), toolbox.FileSchema, "", 1)
@@ -88,20 +85,18 @@ func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 		}
 		filename = path.Join(parentDirecotry, filename)
 	}
-	if ! toolbox.FileExists(filename) {
+	if !toolbox.FileExists(filename) {
 		return nil, fmt.Errorf("File %v does not exists", filename)
 	}
 	var documentResource = url.NewResource(filename)
 	var dao, ok = state.Get(NeatlyDao).(*Dao)
-	if ! ok {
+	if !ok {
 		fmt.Errorf("Failed to get neatly loader %T", state.Get(NeatlyDao))
 	}
 	var aMap = make(map[string]interface{})
 	err := dao.Load(state, documentResource, &aMap)
 	return aMap, err
 }
-
-
 
 //WorkingDirectory return joined path with current directory, ../ is supported as subpath
 func WorkingDirectory(source interface{}, state data.Map) (interface{}, error) {
@@ -110,7 +105,6 @@ func WorkingDirectory(source interface{}, state data.Map) (interface{}, error) {
 		return nil, err
 	}
 	var subPath = toolbox.AsString(source)
-
 
 	for strings.HasSuffix(subPath, "../") {
 		currentDirectory, _ = path.Split(currentDirectory)

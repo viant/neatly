@@ -1,11 +1,11 @@
 package neatly_test
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/neatly"
-	"strings"
 	"github.com/viant/toolbox"
+	"strings"
+	"testing"
 )
 
 func Test_Md5(t *testing.T) {
@@ -16,14 +16,11 @@ func Test_Md5(t *testing.T) {
 	assert.EqualValues(t, "123c274fb9a25ddbc77c1634f1e55525", md5)
 }
 
-
-
 func Test_WorkingDirectory(t *testing.T) {
 
 	var path, err = neatly.WorkingDirectory("../../abc.txt", nil)
 	assert.Nil(t, err)
 	assert.True(t, strings.HasSuffix(toolbox.AsString(path), "/abc.txt"))
-	assert.True(t, ! strings.Contains(toolbox.AsString(path), ".."))
-
+	assert.True(t, !strings.Contains(toolbox.AsString(path), ".."))
 
 }
