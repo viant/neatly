@@ -18,35 +18,33 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 <a name="Motivation"></a>
 # Motivation 
 
-Most of the data driven application use extensively nested structured data to instruct how application should behave.
-There are various data format that come here handy like vanilla csv, xml, json, yaml which are more or less human friendly. 
-It is however felt  hat once the data grows organizing it with these formats becomes mundane and difficult task.
-As a matter of fact in absence of UI or/and datastore (either RDBMS or NoSQL) data organization is challenging.
-Neatly has been design in mind to address all these concerns promoting flexibility, reusebility, data cohesion, delegation 
-and data organization.
-
+Most of the data-driven application use extensively nested structured data to instruct how the application should behave.
+There is various data format that comes here handy like vanilla CSV, XML, JSON, YAML which are more or less human-friendly. 
+It is however felt hat once the data grows organizing it with these formats becomes the mundane task.
+As a matter of fact, in the absence of UI or/and data store (either RDBMS or NoSQL) data organization is challenging.
+Neatly has been designing in mind to address all these concerns promoting flexibility, reusability, data cohesion, delegation 
+and data organization
 
 
 <a name="Neatly"></a>
 # Neatly
 
-Neatly is a neat format for representing nested structured data, with simple tabular approach.
+Neatly is a neat format for representing nested structured data, with a simple tabular approach.
 
-Neatly use tabular format thus can be easily store as csv or other delimitered format,
+Neatly document uses tabular format thus can be easily stored in CSV or other delimited formats,
 
-The first column in a row represent an **object tag**,  followed by columns defining the object fields.
-Next row/s would define object tag values, in this case the first column would be left empty.
-You can think of an object tag as it is an object definition, whereas object values would creates one or more object instances.
-An object tag can represents a single instance or an instance element wthin an array.
-In the latter case object tag would be created with **[]** prefix.
+The first column in a row represents a **object tag**,  followed by columns defining the object fields.
+Next row/s would define object tag values, in this case, the first column would be left empty.
+You can think of an object tag as it is an object definition, whereas object values would create one or more object instances.
+An object tag can represent a single instance or an instance element within an array.
+In the latter case, object tag would be created with **[]** prefix.
 
-The very first object tag in the document represent a **root object**, which can be mapped to either to user defined struct type or a simple map.  
-
+The very first object tag in the document represents a **root object**,  it can be mapped to either to user-defined struct type or a simple map.  
 
 
 The field defines a path to the leaf object of an object tag.
 
-Field name should start with uppercase letter in order to map to undelying datastructure.
+Field name should start with an uppercase letter to map to the underlying data structure.
 
 It can be prefixed with 
    1) **square bracket '[]'** to denote that field is an array, all rows below will be elements for the array, unless there is empty line
@@ -699,7 +697,7 @@ Builtin udf's
 5) HasResource returns true if external resource exists
 6) Md5 generates md5 for provided parameter
 7) WorkingDirectory returns working directory joined with supplied sub path,  '../' is supported.
-
+8) LoadNeatly loads neatly document as data structure.
 
 ### External resources loading with virtual object value substitution use case.
 
@@ -760,6 +758,8 @@ Neatly tabular representation.
 	a) owner resource path with subpath if provided and asset name
 	b) owner resource path  without subpath and asset name
 	c) Local/remoteResourceRepo and asset name
+
+
 
 
 ### Accessing meta data 
