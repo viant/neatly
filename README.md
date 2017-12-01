@@ -33,7 +33,7 @@ Neatly is a neat format for representing nested structured data, with a simple t
 
 Neatly document uses tabular format thus can be easily stored in CSV or other delimited formats,
 
-The first column in a row represents a **object tag**,  followed by columns defining the object fields.
+The first column in a row represents an **object tag**,  followed by columns defining the object fields.
 Next row/s would define object tag values, in this case, the first column would be left empty.
 You can think of an object tag as it is an object definition, whereas object values would create one or more object instances.
 An object tag can represent a single instance or an instance element within an array.
