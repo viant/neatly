@@ -14,6 +14,7 @@ import (
 
 //OwnerURL represewnt currently loading netly URL
 const OwnerURL = "ownerURL"
+const NeatlyDao = "nearlyDAO"
 
 //Dao represents neatly data access object
 type Dao struct {
@@ -29,6 +30,8 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	if err != nil {
 		return err
 	}
+	context.Put(OwnerURL, source.URL)
+	context.Put(NeatlyDao, d)
 	d.AddStandardUdf(context)
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	targetMap, err := d.load(context, source, scanner)
@@ -55,6 +58,7 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("AsBool", AsBool)
 	context.Put("HasResource", HasResource)
 	context.Put("Md5", Md5)
+	context.Put("LoadNeatly", LoadNeatly)
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
@@ -146,19 +150,19 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 			tag.setTagObject(context, record.Record)
 
 			for j := 1; j < len(record.Columns); j++ {
-				if recordHeight, err = d.processCell(context,  record, lines, i, j, recordHeight, true); err != nil {
+				if recordHeight, err = d.processCell(context, record, lines, i, j, recordHeight, true); err != nil {
 					return nil, err
 				}
 			}
 			for j := 1; j < len(record.Columns); j++ {
-				if recordHeight, err = d.processCell(context,  record, lines, i, j, recordHeight, false); err != nil {
+				if recordHeight, err = d.processCell(context, record, lines, i, j, recordHeight, false); err != nil {
 					return nil, err
 				}
 			}
 		}
 
 		i += recordHeight
-		var isLast = i+1 == len(lines)
+		var isLast = i + 1 == len(lines)
 		if isLast && tag.HasActiveIterator() {
 
 			if tag.Iterator.Next() {
@@ -179,6 +183,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 	if fieldExpression == "" {
 		return recordHeight, nil
 	}
+
 	field := NewField(fieldExpression)
 
 	value, has := record.Record[field.expression]
@@ -189,12 +194,12 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 		return recordHeight, nil
 	}
 
-
 	tagObject := context.tagObject
 	rootObject := context.rootObject
 	textValue := toolbox.AsString(value)
 
-	if strings.HasPrefix(textValue, "%%") { //escape forward object tag reference
+	if strings.HasPrefix(textValue, "%%") {
+		//escape forward object tag reference
 		textValue = string(textValue[1:])
 	} else {
 		isReference := strings.HasPrefix(textValue, "%")
@@ -218,6 +223,13 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 		targetObject = context.virtualObjects
 	} else {
 		targetObject = tagObject
+		if field.expression == "This" && toolbox.IsMap(val) {
+			var aMap = toolbox.AsMap(val)
+			for k, v := range aMap {
+				targetObject.Put(k, v)
+			}
+			return recordHeight, err
+		}
 	}
 	field.Set(val, targetObject)
 	if field.HasArrayComponent {
@@ -344,7 +356,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 			}
 		}
 		if !exists && context.tag.Subpath != "" {
-			fileCandidate := path.Join(ownerURL,  context.tag.Subpath, URI)
+			fileCandidate := path.Join(ownerURL, context.tag.Subpath, URI)
 			URL = toolbox.FileSchema + fileCandidate
 		}
 	}
@@ -484,11 +496,11 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent) - 1])
 	return data.Map(aMap), nil
 }
 
-func (d *Dao) loadExternalResource(context *tagContext,  assetURI string) (string, error) {
+func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string, error) {
 	resource, err := d.getExternalResource(context, assetURI)
 	var result string
 	if err == nil {
@@ -505,11 +517,11 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1: len(value) - 1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1: len(value) - 1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {
@@ -545,11 +557,11 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, error) {
 	virtualObjects := context.virtualObjects
 	var assets []string
-	if strings.HasPrefix(value, "##") { //escape #
+	if strings.HasPrefix(value, "##") {
+		//escape #
 		value = string(value[1:])
 	} else if strings.HasPrefix(value, "#") {
-		context.context.Put(OwnerURL, context.source.URL)
-		assets= strings.Split(value, "|")
+		assets = strings.Split(value, "|")
 
 		mainAsset, err := d.loadExternalResource(context, assets[0])
 		if err != nil {
@@ -560,7 +572,6 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		value = mainAsset
 	}
 
-
 	if len(assets) == 0 && strings.Contains(value, "|") && strings.HasPrefix(value, "[") {
 		assets = strings.Split(value, "|")
 	}
@@ -568,7 +579,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 	if len(assets) > 1 {
 		escapeQuotes := strings.HasPrefix(value, "{") || strings.HasPrefix(value, "[")
 		for i := 1; i < len(assets); i++ {
-			aMap, err := d.loadMap(context, assets[i], escapeQuotes, i-1)
+			aMap, err := d.loadMap(context, assets[i], escapeQuotes, i - 1)
 			if err != nil {
 				return nil, err
 			}

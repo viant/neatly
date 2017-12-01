@@ -51,6 +51,7 @@ It can be prefixed with
    2) **slash '/'** to denote that field belongs to root object rather then preceding tag object
    3) **colon ':'**  or expression stating with **lowercase** character denotes a virtual object field that can be used as data substitution with dollar($) sign expression.
    
+   
 On top of that field definition can use dot (.) to define nested object of object or array type. 
 For instance 
    1) field1 defines 'field1' field.
@@ -58,6 +59,9 @@ For instance
    3) field3.[]a.attr3 defines 'field3' field of an object type, which has another 'a' field  of an array of object type with 'attr3' field.
    4) /data.[]tables defines in the root object 'data' field of an object type which has another 'tables' field of an array type.
    5) :v.attr5 defines a virtual object which has 'v' field  of an object type which has another 'attr5' field .
+
+
+**This** keyword used in field expression expands corresponding key/value directly to the current object tag.
 
 
 ## Neatly capabilities

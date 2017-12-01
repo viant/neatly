@@ -491,3 +491,48 @@ func TestDao_LoadUseCase11(t *testing.T) {
 	}
 
 }
+
+
+
+
+func TestDao_LoadUseCase12(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var useCase7 = &UseCase7{}
+	err := dao.Load(context, url.NewResource("test/use_case12.csv"), useCase7)
+
+
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(useCase7.UseCases))
+
+	for i := 0; i < 2; i++ {
+		assert.Equal(t, i+1, useCase7.UseCases[i].Id)
+		assert.Equal(t, fmt.Sprintf("use case %d", i+1), useCase7.UseCases[i].Description)
+	}
+
+	//mydb, ok := useCase7.Setup["MyDb"]
+	//if assert.True(t, ok) {
+	//	customers, ok := mydb["Customer"]
+	//	if assert.True(t, ok) {
+	//		assert.Equal(t, 2, len(customers))
+	//
+	//		{
+	//			var customer = customers[0]
+	//			assert.Equal(t, 1.0, customer["ID"])
+	//			assert.EqualValues(t, "Smith", customer["NAME"])
+	//			assert.EqualValues(t, "200", customer["DAILY_CAP"])
+	//			assert.EqualValues(t, "3000", customer["OVERALL_CAP"])
+	//
+	//		}
+	//		{
+	//			var customer = customers[1]
+	//			assert.Equal(t, 2.0, customer["ID"])
+	//			assert.EqualValues(t, "Kowalczyk", customer["NAME"])
+	//			assert.EqualValues(t, "100", customer["DAILY_CAP"])
+	//			assert.EqualValues(t, "1000", customer["OVERALL_CAP"])
+	//
+	//		}
+	//	}
+	//}
+
+}

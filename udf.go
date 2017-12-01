@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 	"os"
+	"github.com/viant/toolbox/url"
 )
 
 //AsMap converts source into map
@@ -74,6 +75,32 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 	var result = toolbox.FileExists(filename)
 	return result, nil
 }
+
+
+//LoadNeatly loads neatly document as data structure, source represents path to nearly document
+func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
+	var filename = toolbox.AsString(source)
+	if ! strings.HasPrefix(filename, "/") {
+		var parentDirecotry = ""
+		if state.Has(OwnerURL) {
+			var workflowPath = strings.Replace(state.GetString(OwnerURL), toolbox.FileSchema, "", 1)
+			parentDirecotry, _ = path.Split(workflowPath)
+		}
+		filename = path.Join(parentDirecotry, filename)
+	}
+	if ! toolbox.FileExists(filename) {
+		return nil, fmt.Errorf("File %v does not exists", filename)
+	}
+	var documentResource = url.NewResource(filename)
+	var dao, ok = state.Get(NeatlyDao).(*Dao)
+	if ! ok {
+		fmt.Errorf("Failed to get neatly loader %T", state.Get(NeatlyDao))
+	}
+	var aMap = make(map[string]interface{})
+	err := dao.Load(state, documentResource, &aMap)
+	return aMap, err
+}
+
 
 
 //WorkingDirectory return joined path with current directory, ../ is supported as subpath

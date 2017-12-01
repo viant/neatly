@@ -1,0 +1,2 @@
+Document,Subpath,Id,Description ,/Setup.MyDb.[]Customer,:data.DAILY_CAP,:data.OVERALL_CAP
+,usecase11/002*,2,#use_case.txt,#customer.json|$data,100,1000
