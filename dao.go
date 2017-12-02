@@ -33,6 +33,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	context.Put(OwnerURL, source.URL)
 	context.Put(NeatlyDao, d)
 	d.AddStandardUdf(context)
+	text = strings.Replace(text, "\r", "", len(text))
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	targetMap, err := d.load(context, source, scanner)
 	if err != nil {

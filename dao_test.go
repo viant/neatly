@@ -503,29 +503,5 @@ func TestDao_LoadUseCase12(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("use case %d", i+1), useCase7.UseCases[i].Description)
 	}
 
-	//mydb, ok := useCase7.Setup["MyDb"]
-	//if assert.True(t, ok) {
-	//	customers, ok := mydb["Customer"]
-	//	if assert.True(t, ok) {
-	//		assert.Equal(t, 2, len(customers))
-	//
-	//		{
-	//			var customer = customers[0]
-	//			assert.Equal(t, 1.0, customer["ID"])
-	//			assert.EqualValues(t, "Smith", customer["NAME"])
-	//			assert.EqualValues(t, "200", customer["DAILY_CAP"])
-	//			assert.EqualValues(t, "3000", customer["OVERALL_CAP"])
-	//
-	//		}
-	//		{
-	//			var customer = customers[1]
-	//			assert.Equal(t, 2.0, customer["ID"])
-	//			assert.EqualValues(t, "Kowalczyk", customer["NAME"])
-	//			assert.EqualValues(t, "100", customer["DAILY_CAP"])
-	//			assert.EqualValues(t, "1000", customer["OVERALL_CAP"])
-	//
-	//		}
-	//	}
-	//}
 
 }
