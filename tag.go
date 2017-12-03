@@ -79,9 +79,11 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 //setMeta sets Tag, optionally TagIndex and Subpath to the provided object
 func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	object["Tag"] = t.Name
+
 	if t.HasActiveIterator() {
 		object["TagIndex"] = t.Iterator.Index()
 	}
+
 	value, has := record["Subpath"]
 	if has {
 		t.Subpath = t.expandPathIfNeeded(toolbox.AsString(value))
@@ -91,6 +93,7 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	}
 	object["TagId"] = t.TagId()
 }
+
 
 func (t *Tag) TagId() string {
 	var index = ""

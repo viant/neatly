@@ -1,7 +1,6 @@
 package neatly
 
 import (
-	"bytes"
 	"crypto/md5"
 	"fmt"
 	"github.com/viant/toolbox"
@@ -19,13 +18,8 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 		return source, nil
 	}
 	if toolbox.IsString(source) {
-		buf := new(bytes.Buffer)
-		err := toolbox.NewJSONEncoderFactory().Create(buf).Encode(toolbox.AsString(source))
-		if err != nil {
-			return nil, err
-		}
 		aMap := make(map[string]interface{})
-		err = toolbox.NewJSONDecoderFactory().Create(buf).Decode(aMap)
+		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aMap)
 		if err != nil {
 			return nil, err
 		}

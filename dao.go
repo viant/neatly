@@ -126,6 +126,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		line := lines[i]
 		var hasActiveIterator = tag.HasActiveIterator()
 		line = d.expandMeta(context, line)
+
 		isHeaderLine := !strings.HasPrefix(line, ",")
 		decoder := d.factory.Create(strings.NewReader(line))
 		if isHeaderLine {
@@ -149,6 +150,14 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		if !record.IsEmpty() {
 			context.virtualObjects = data.NewMap()
 			tag.setTagObject(context, record.Record)
+			if strings.Contains(line, "$") {
+				for k, v := range record.Record {
+					if !toolbox.IsString(v) {
+						continue
+					}
+					record.Record[k] = d.expandMeta(context, toolbox.AsString(v))
+				}
+			}
 
 			for j := 1; j < len(record.Columns); j++ {
 				if recordHeight, err = d.processCell(context, record, lines, i, j, recordHeight, true); err != nil {
@@ -497,7 +506,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -518,11 +527,11 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1 : len(value)-1]), nil
+		return string(value[1: len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1 : len(value)-1]), nil
+		return string(value[1: len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {
@@ -547,8 +556,9 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 	var replacementMap = data.NewMap()
 	replacementMap.Put("tagId", context.tag.TagId())
 	replacementMap.Put("tag", context.tag.Name)
-	replacementMap.Put("subPath", context.tag.Subpath)
-
+	if context.tag.Subpath != "" {
+		replacementMap.Put("subPath", context.tag.Subpath)
+	}
 	if context.tag.HasActiveIterator() {
 		replacementMap.Put("index", context.tag.Iterator.Index())
 	}

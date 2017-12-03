@@ -501,7 +501,35 @@ func TestDao_LoadUseCase12(t *testing.T) {
 	for i := 0; i < 2; i++ {
 		assert.Equal(t, i+1, useCase7.UseCases[i].Id)
 		assert.Equal(t, fmt.Sprintf("use case %d", i+1), useCase7.UseCases[i].Description)
+
 	}
 
 
+}
+
+
+func TestMissingReference(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var document = make(map[string]interface{})
+	err := dao.Load(context, url.NewResource("test/broken1.csv"), &document)
+	assert.NotNil(t, err)
+}
+
+
+
+func TestBrokenJsonReference(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var document = make(map[string]interface{})
+	err := dao.Load(context, url.NewResource("test/broken2.csv"), &document)
+	assert.NotNil(t, err)
+}
+
+func TestBrokenExternalReference(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var document = make(map[string]interface{})
+	err := dao.Load(context, url.NewResource("test/broken3.csv"), &document)
+	assert.NotNil(t, err)
 }
