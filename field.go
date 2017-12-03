@@ -21,6 +21,7 @@ type Field struct {
 
 //Set sets value into target map, if indexes are provided value will be pushed into a slice
 func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
+
 	var index = 0
 	if !target.Has(f.Field) {
 		if f.IsArray {
@@ -73,6 +74,11 @@ func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
 	}
 
 	if f.IsArray {
+		if collectionPointer, ok := value.(*data.Collection); ok {
+			target.Put(f.Field, collectionPointer)
+			return
+		}
+
 		index, indexes = shiftIndex(indexes...)
 		collection := target.GetCollection(f.Field)
 		collection.PadWithMap(index + 1)

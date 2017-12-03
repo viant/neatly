@@ -68,6 +68,7 @@ func (d *Dao) processTag(context *tagContext) (err error) {
 	if context.objectContainer.Has(context.tag.Name) {
 		return nil
 	}
+
 	if context.tag.IsArray {
 		var collection = data.NewCollection()
 		context.objectContainer.Put(context.tag.Name, collection)
@@ -506,7 +507,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -527,11 +528,11 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {

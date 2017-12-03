@@ -4,10 +4,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/neatly"
 	"github.com/viant/toolbox"
-	"strings"
-	"testing"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
+	"strings"
+	"testing"
 )
 
 func Test_Md5(t *testing.T) {
@@ -75,21 +75,17 @@ func Test_AsMap(t *testing.T) {
 	}
 }
 
-
 func Test_AsBool(t *testing.T) {
 	ok, err := neatly.AsBool("true", nil)
 	assert.Nil(t, err)
 	assert.Equal(t, true, ok)
 }
 
-
-
 func Test_AsFloat(t *testing.T) {
 	value, err := neatly.AsFloat(0.3, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, 0.3, value)
 }
-
 
 func Test_AsInt(t *testing.T) {
 	value, err := neatly.AsInt(4.3, nil)

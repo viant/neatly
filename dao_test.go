@@ -504,9 +504,7 @@ func TestDao_LoadUseCase12(t *testing.T) {
 
 	}
 
-
 }
-
 
 func TestMissingReference(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
@@ -515,8 +513,6 @@ func TestMissingReference(t *testing.T) {
 	err := dao.Load(context, url.NewResource("test/broken1.csv"), &document)
 	assert.NotNil(t, err)
 }
-
-
 
 func TestBrokenJsonReference(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
