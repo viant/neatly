@@ -502,9 +502,11 @@ func TestDao_LoadUseCase12(t *testing.T) {
 	for i := 0; i < 2; i++ {
 		assert.Equal(t, i+1, useCase7.UseCases[i].Id)
 		assert.Equal(t, fmt.Sprintf("use case %d", i+1), useCase7.UseCases[i].Description)
+
 	}
 
 }
+
 
 type UseCase13 struct {
 	Prepare []struct {
@@ -522,9 +524,9 @@ type UseCase13 struct {
 
 func TestDao_LoadUseCase13(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
-	var context = data.NewMap()
+	var context= data.NewMap()
 
-	var useCase = &UseCase13{}
+	var useCase= &UseCase13{}
 	err := dao.Load(context, url.NewResource("test/use_case13.csv"), &useCase)
 
 	if assert.Nil(t, err) {
@@ -535,5 +537,30 @@ func TestDao_LoadUseCase13(t *testing.T) {
 		assert.Equal(t, 3, len(useCase.Numbers.Seq))
 	}
 
+}
 
+
+func TestMissingReference(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var document = make(map[string]interface{})
+	err := dao.Load(context, url.NewResource("test/broken1.csv"), &document)
+	assert.NotNil(t, err)
+}
+
+func TestBrokenJsonReference(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var document = make(map[string]interface{})
+	err := dao.Load(context, url.NewResource("test/broken2.csv"), &document)
+	assert.NotNil(t, err)
+}
+
+
+func TestBrokenExternalReference(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+	var document = make(map[string]interface{})
+	err := dao.Load(context, url.NewResource("test/broken3.csv"), &document)
+	assert.NotNil(t, err)
 }

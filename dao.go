@@ -33,6 +33,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	context.Put(OwnerURL, source.URL)
 	context.Put(NeatlyDao, d)
 	d.AddStandardUdf(context)
+	text = strings.Replace(text, "\r", "", len(text))
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	targetMap, err := d.load(context, source, scanner)
 	if err != nil {
@@ -67,6 +68,7 @@ func (d *Dao) processTag(context *tagContext) (err error) {
 	if context.objectContainer.Has(context.tag.Name) {
 		return nil
 	}
+
 	if context.tag.IsArray {
 		var collection = data.NewCollection()
 		context.objectContainer.Put(context.tag.Name, collection)
@@ -125,6 +127,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		line := lines[i]
 		var hasActiveIterator = tag.HasActiveIterator()
 		line = d.expandMeta(context, line)
+
 		isHeaderLine := !strings.HasPrefix(line, ",")
 		decoder := d.factory.Create(strings.NewReader(line))
 		if isHeaderLine {
@@ -149,6 +152,14 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 			context.virtualObjects = data.NewMap()
 			context.fieldIndex = make(map[string]int)
 			tag.setTagObject(context, record.Record)
+			if strings.Contains(line, "$") {
+				for k, v := range record.Record {
+					if !toolbox.IsString(v) {
+						continue
+					}
+					record.Record[k] = d.expandMeta(context, toolbox.AsString(v))
+				}
+			}
 
 			for j := 1; j < len(record.Columns); j++ {
 				if recordHeight, err = d.processCell(context, record, lines, i, j, recordHeight, true); err != nil {
@@ -546,8 +557,9 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 	var replacementMap = data.NewMap()
 	replacementMap.Put("tagId", context.tag.TagId())
 	replacementMap.Put("tag", context.tag.Name)
-	replacementMap.Put("subPath", context.tag.Subpath)
-
+	if context.tag.Subpath != "" {
+		replacementMap.Put("subPath", context.tag.Subpath)
+	}
 	if context.tag.HasActiveIterator() {
 		replacementMap.Put("index", context.tag.Iterator.Index())
 	}

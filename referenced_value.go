@@ -29,7 +29,7 @@ func (v *referenceValues) Add(tagName string, field *Field, object data.Map) err
 	}
 	referencedValue.Setter = func(value interface{}) {
 		referencedValue.Used = true
-		referencedValue.Object.Put(field.expression, value)
+		field.Set(value, referencedValue.Object)
 	}
 	(*v)[tagName] = referencedValue
 	return nil
