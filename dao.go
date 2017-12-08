@@ -569,7 +569,10 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, error) {
 	virtualObjects := context.virtualObjects
 	var assets []string
-	if strings.HasPrefix(value, "##") {
+
+	if strings.HasPrefix(value, "$") {
+		return virtualObjects.Expand(value), nil
+	} else if strings.HasPrefix(value, "##") {
 		//escape #
 		value = string(value[1:])
 	} else if strings.HasPrefix(value, "#") {
