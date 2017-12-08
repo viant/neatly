@@ -147,6 +147,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		}
 		if !record.IsEmpty() {
 			context.virtualObjects = data.NewMap()
+			context.fieldIndex = make(map[string]int)
 			tag.setTagObject(context, record.Record)
 
 			for j := 1; j < len(record.Columns); j++ {
@@ -215,7 +216,25 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 
 	var targetObject data.Map
 	if field.IsRoot {
-		setRootField(field, rootObject, val)
+		if!  field.HasArrayComponent {
+			setRootField(field, rootObject, val, 0)
+			return recordHeight, err
+		}
+
+		var arrayPath = field.ArrayPath()
+		if _, has := context.fieldIndex[arrayPath]; !has {
+			context.fieldIndex[arrayPath] = field.GetArraySize(rootObject)
+		}
+
+		var index = context.fieldIndex[arrayPath]
+		if field.Leaf.IsArray  && toolbox.IsSlice(val) {
+			for _, item := range toolbox.AsSlice(val) {
+				setRootField(field, rootObject, item, index)
+				index++
+			}
+		} else {
+			setRootField(field, rootObject, val, index)
+		}
 		return recordHeight, nil
 	}
 
@@ -232,7 +251,8 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 		}
 	}
 	field.Set(val, targetObject)
-	if field.HasArrayComponent {
+
+	if ! field.IsVirtual && field.HasArrayComponent {
 		recordHeight, err = d.processArrayValues(context, field, recordIndex, lines, record, targetObject, recordHeight)
 	}
 	return recordHeight, err
@@ -273,29 +293,9 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 	return recordHeight, nil
 }
 
-func setRootField(field *Field, rootObject data.Map, val interface{}) {
-	if field.HasArrayComponent {
-		var expr = strings.Replace(field.expression, "[]", "", 1)
-		expr = strings.Replace(expr, "/", "", 1)
+func setRootField(field *Field, rootObject data.Map, val interface{}, index int) {
+	field.Set(val, rootObject, index)
 
-		bucket, has := rootObject.GetValue(expr)
-		if !has {
-			bucket = data.NewCollection()
-		}
-		var bucketSlice = toolbox.AsSlice(bucket)
-		if toolbox.IsSlice(val) {
-			aSlice := toolbox.AsSlice(val)
-			for _, item := range aSlice {
-				bucketSlice = append(bucketSlice, item)
-			}
-		} else {
-			bucketSlice = append(bucketSlice, val)
-		}
-		rootObject.SetValue(expr, bucketSlice)
-
-	} else {
-		field.Set(val, rootObject)
-	}
 }
 
 func readLines(scanner *bufio.Scanner) []string {
@@ -328,7 +328,7 @@ getExternalResource returns resource for provided asset URI. This function tries
 */
 func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resource, error) {
 	if URI == "" {
-		return nil, fmt.Errorf("Resource was empty")
+		return nil, fmt.Errorf("resource  was empty")
 	}
 	if strings.Contains(URI, "://") || strings.HasPrefix(URI, "/") {
 		return url.NewResource(URI, context.source.Credential), nil
@@ -433,7 +433,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		asset = strings.TrimSpace(asset)
 		value, has := virtualObjects.GetValue(string(asset[1:]))
 		if !has {
-			return nil, fmt.Errorf("Failed resolve $%v as variable substitution source", asset)
+			return nil, fmt.Errorf("failed resolve $%v as variable substitution source", asset)
 		}
 		if toolbox.IsSlice(value) || toolbox.IsMap(value) {
 			assetContent = asJSONText(value)
@@ -467,7 +467,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 			if assetContentLength > 50 {
 				assetContentLength = 50
 			}
-			return nil, fmt.Errorf("Failed to decode json:%v, %v", string(assetContent[:assetContentLength]), err)
+			return nil, fmt.Errorf("failed to decode json:%v, %v", string(assetContent[:assetContentLength]), err)
 		}
 	}
 	if escapeQuotes {
@@ -496,7 +496,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -507,7 +507,7 @@ func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string
 		result, err = resource.DownloadText()
 	}
 	if err != nil {
-		return "", fmt.Errorf("Failed to load external resource: %v %v", assetURI, err)
+		return "", fmt.Errorf("failed to load external resource: %v %v", assetURI, err)
 	}
 	return result, err
 }
@@ -517,25 +517,25 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1 : len(value)-1]), nil
+		return string(value[1: len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1 : len(value)-1]), nil
+		return string(value[1: len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {
 		var jsonObject = make(map[string]interface{})
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(value)).Decode(&jsonObject)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to decode: %v %T, %v", value, value, err)
+			return nil, fmt.Errorf("failed to decode: %v %T, %v", value, value, err)
 		}
 		return jsonObject, nil
 	} else if strings.HasPrefix(value, "[") {
 		var jsonArray = make([]interface{}, 0)
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(value)).Decode(&jsonArray)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to decode: %v %v", value, err)
+			return nil, fmt.Errorf("failed to decode: %v %v", value, err)
 		}
 		return jsonArray, nil
 	}
@@ -617,6 +617,7 @@ type tagContext struct {
 	context         data.Map
 	referenceValues referenceValues
 	objectContainer data.Map
+	fieldIndex      map[string]int
 	rootObject      data.Map
 	tag             *Tag
 	tagObject       data.Map

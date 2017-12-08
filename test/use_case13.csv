@@ -1,0 +1,5 @@
+Root,Prepare,,,,,,,,,
+,%Prepare,,,,,,,,,
+[]Prepare,rec.ID,rec.ACCOUNT_ID,rec.NAME,rec.EMAIL,[]auto.0,[]auto.1,/Data.[]mydb1.Table,/Data.[]mydb1.Value,/Data.[]mydb1.Autoincrement,/Numbers.[]Seq
+,$meta.USER,$meta.ACCOUNT_ID,abc,,meta.USER,meta.ACCOUNT,USER_ACCOUNT,$rec,$auto,[1]
+,$meta.USER,$meta.ACCOUNT_ID,abc2,a@ere.com,meta.USER,,USER_ACCOUNT,$rec,$auto,"[2,3]"

@@ -168,18 +168,19 @@ func TestDao_LoadUseCase3(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 2017, useCase3.Created.Year())
 	assert.Equal(t, 3, len(useCase3.Merits))
-	assert.Equal(t, 3, len(useCase3.Bonus))
 
 	for i := 0; i < 3; i++ {
 		var merit = useCase3.Merits[i]
 		assert.Equal(t, i+1, merit.EmpNo)
 	}
 
-	var bonuses = []float64{10000, 8000, 4000}
-	for i := 0; i < 3; i++ {
-		var bonus = useCase3.Bonus[i]
-		assert.Equal(t, i+1, bonus.EmpNo)
-		assert.Equal(t, bonuses[i], bonus.Amount)
+	if assert.Equal(t, 3, len(useCase3.Bonus)) {
+		var bonuses = []float64{10000, 8000, 4000}
+		for i := 0; i < 3; i++ {
+			var bonus = useCase3.Bonus[i]
+			assert.Equal(t, i+1, bonus.EmpNo)
+			assert.Equal(t, bonuses[i], bonus.Amount)
+		}
 	}
 
 }
@@ -284,7 +285,7 @@ type UseCase7Item struct {
 }
 
 type UseCase7 struct {
-	Setup    map[string]map[string][]map[string]interface{}
+	Setup map[string]map[string][]map[string]interface{}
 	UseCases []*UseCase7Item
 }
 
@@ -503,29 +504,36 @@ func TestDao_LoadUseCase12(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("use case %d", i+1), useCase7.UseCases[i].Description)
 	}
 
-	//mydb, ok := useCase7.Setup["MyDb"]
-	//if assert.True(t, ok) {
-	//	customers, ok := mydb["Customer"]
-	//	if assert.True(t, ok) {
-	//		assert.Equal(t, 2, len(customers))
-	//
-	//		{
-	//			var customer = customers[0]
-	//			assert.Equal(t, 1.0, customer["ID"])
-	//			assert.EqualValues(t, "Smith", customer["NAME"])
-	//			assert.EqualValues(t, "200", customer["DAILY_CAP"])
-	//			assert.EqualValues(t, "3000", customer["OVERALL_CAP"])
-	//
-	//		}
-	//		{
-	//			var customer = customers[1]
-	//			assert.Equal(t, 2.0, customer["ID"])
-	//			assert.EqualValues(t, "Kowalczyk", customer["NAME"])
-	//			assert.EqualValues(t, "100", customer["DAILY_CAP"])
-	//			assert.EqualValues(t, "1000", customer["OVERALL_CAP"])
-	//
-	//		}
-	//	}
-	//}
+}
+
+type UseCase13 struct {
+	Prepare []struct {
+		TagId string
+	}
+	Data map[string][]struct {
+		Autoincrement []string
+		Table         string
+		Value         interface{}
+	}
+	Numbers struct {
+		Seq[]int
+	}
+}
+
+func TestDao_LoadUseCase13(t *testing.T) {
+	dao := neatly.NewDao("", "", "", nil)
+	var context = data.NewMap()
+
+	var useCase = &UseCase13{}
+	err := dao.Load(context, url.NewResource("test/use_case13.csv"), &useCase)
+
+	if assert.Nil(t, err) {
+		assert.Equal(t, 2, len(useCase.Data["mydb1"]))
+		assert.EqualValues(t, []string{"meta.USER", "meta.ACCOUNT"}, useCase.Data["mydb1"][0].Autoincrement)
+		assert.EqualValues(t, []string{"meta.USER"}, useCase.Data["mydb1"][1].Autoincrement)
+
+		assert.Equal(t, 3, len(useCase.Numbers.Seq))
+	}
+
 
 }

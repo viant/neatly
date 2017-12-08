@@ -14,9 +14,11 @@ type Field struct {
 	Child             *Field //child expression if expression contains .
 	IsArray           bool   //is this filed an array type
 	HasSubPath        bool   //flag indicating if this field has sub fields
-	HasArrayComponent bool   //flag indicating if this or child fileds have an array component
+	HasArrayComponent bool   //flag indicating if this or child fieds have an array component
 	IsRoot            bool   //flag indicating if this field is Root
 	IsVirtual         bool   //flag indicating if this field belong to virtual object
+	IsIndex           bool   //flag indicating if this filed is actual array index, as opposed to sub field name
+	Leaf              *Field //leaf field
 }
 
 //Set sets value into target map, if indexes are provided value will be pushed into a slice
@@ -29,11 +31,14 @@ func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
 			target.Put(f.Field, data.NewMap())
 		}
 	}
+
 	var aMap data.Map
 	var action func(data data.Map, indexes ...int)
+
 	if !f.HasSubPath {
+
 		if f.IsArray {
-			action = func(data data.Map, indexes ...int) {
+			action = func(object data.Map, indexes ...int) {
 				collection := target.GetCollection(f.Field)
 				(*collection)[index] = value
 			}
@@ -68,6 +73,16 @@ func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
 
 	} else {
 		action = func(data data.Map, indexes ...int) {
+			if f.Child.IsIndex {
+				collection := target.GetCollection(f.Field)
+				var index = toolbox.AsInt(f.Child.Field)
+				for i := len(*collection); i < index+1; i++ {
+					*collection = append(*collection, nil)
+				}
+				(*collection)[index] = value
+				return
+
+			}
 			f.Child.Set(value, data, indexes...)
 		}
 	}
@@ -86,6 +101,46 @@ func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
 	action(aMap, indexes...)
 }
 
+func (f *Field) ArrayPath() string {
+	if ! f.HasArrayComponent {
+		return ""
+	}
+	var result = make([]string, 0)
+	field := f
+	for ; ; {
+		result = append(result, field.Field)
+		if field.IsArray || ! field.HasSubPath {
+			break
+		}
+
+		field = field.Child
+	}
+	return strings.Join(result, ".")
+}
+
+func (f *Field) GetArraySize(value data.Map) int {
+	if ! f.HasArrayComponent {
+		return 0
+	}
+	field := f
+	for ; ; {
+		subValue := value.Get(field.Field)
+		if subValue == nil {
+			return 0
+		}
+		if field.IsArray {
+			return len(toolbox.AsSlice(subValue))
+		}
+		if ! field.HasSubPath {
+			return 0
+		}
+
+		value = data.Map(toolbox.AsMap(subValue))
+		field = field.Child
+	}
+	return 0
+}
+
 //NewField return a new Field for provided expression.
 func NewField(expression string) *Field {
 	var parsedExpression = expression
@@ -93,31 +148,47 @@ func NewField(expression string) *Field {
 	if isRoot {
 		parsedExpression = string(parsedExpression[1:])
 	}
+
 	isVirtual := strings.HasPrefix(parsedExpression, ":")
 	if isVirtual {
 		parsedExpression = string(parsedExpression[1:])
 	}
-	runes := []rune(expression)
+
+	isArray := strings.HasPrefix(parsedExpression, "[]")
+	if isArray {
+		parsedExpression = string(parsedExpression[2:])
+	}
+	runes := []rune(parsedExpression)
 	if unicode.IsLower(runes[0]) {
 		isVirtual = true
 	}
+
 	var result = &Field{
 		expression:        expression,
-		HasArrayComponent: strings.Contains(parsedExpression, "[]"),
-		IsArray:           strings.HasPrefix(parsedExpression, "[]"),
+		HasArrayComponent: isArray || strings.Contains(parsedExpression, "[]"),
+		IsArray:           isArray,
 		HasSubPath:        strings.Contains(parsedExpression, "."),
 		Field:             parsedExpression,
 		IsRoot:            isRoot,
 		IsVirtual:         isVirtual,
 	}
 
+
+
 	if result.HasSubPath {
 		dotPosition := strings.Index(parsedExpression, ".")
 		result.Field = string(result.Field[:dotPosition])
 		result.Child = NewField(string(parsedExpression[dotPosition+1:]))
-	}
-	if result.IsArray {
-		result.Field = string(result.Field[2:])
+		if result.IsArray {
+			_, err := toolbox.ToInt(result.Child.Field)
+			if err == nil {
+				result.Child.IsIndex = true
+			}
+		}
+		result.Leaf = result.Child.Leaf
+
+	} else {
+		result.Leaf = result
 	}
 	return result
 }
