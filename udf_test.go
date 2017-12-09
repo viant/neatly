@@ -48,7 +48,7 @@ func Test_HasResource(t *testing.T) {
 		assert.False(t, toolbox.AsBoolean(has))
 	}
 
-	state.Put(neatly.OwnerURL, url.NewResource("test/usecase7/001/a.csv").URL)
+	state.Put(neatly.OwnerURL, url.NewResource("test/usecase7/001/customer.json").URL)
 	{
 		has, err := neatly.HasResource("use_case.txt", state)
 		assert.Nil(t, err)

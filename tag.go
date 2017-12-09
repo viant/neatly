@@ -48,23 +48,28 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 	if !strings.HasSuffix(subpath, "*") {
 		return subpath
 	}
-	subPathElements := strings.Split(subpath, "/")
-	var subPathParent = ""
-	subPathPrefix := strings.Replace(subpath, "*", "", 1)
-
 	parentURL, _ := toolbox.URLSplit(t.OwnerSource.URL)
-	if len(subPathPrefix) > 1 {
-		subPathPrefix = strings.Replace(subPathElements[len(subPathElements)-1], "*", "", 1)
-		subPathParent = path.Join(subPathElements[:len(subPathElements)-1]...)
-		parentURL = toolbox.URLPathJoin(parentURL, subPathParent)
-	}
+	var leafDirectory = ""
+	var subPathParent = ""
+	subPathElements := strings.Split(subpath, "/")
+		for  _, candidate := range subPathElements {
+			if strings.Contains(candidate, "*") {
+				leafDirectory = strings.Replace(candidate, "*", "", 1)
+				break
+			}
+			subPathParent = path.Join(subPathParent, candidate)
+			parentURL = toolbox.URLPathJoin(parentURL,candidate)
+		}
 	storageService, err := storage.NewServiceForURL(parentURL, t.OwnerSource.Credential)
 	if err == nil {
 		candidates, err := storageService.List(parentURL)
 		if err == nil {
 			for _, candidate := range candidates {
+				if candidate.URL() == parentURL {
+					continue
+				}
 				_, candidateName := toolbox.URLSplit(candidate.URL())
-				if strings.HasPrefix(candidateName, subPathPrefix) {
+				if strings.Contains(candidateName, leafDirectory) {
 					if subPathParent != "" {
 						return path.Join(subPathParent, candidateName)
 					}

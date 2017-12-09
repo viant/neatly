@@ -55,15 +55,22 @@ func Md5(source interface{}, state data.Map) (interface{}, error) {
 	return result, nil
 }
 
+
+func GetOwnerDirectory(state data.Map) (string, error) {
+	if !state.Has(OwnerURL) {
+		return "", fmt.Errorf("OwnerURL was empty")
+	}
+	var resource = url.NewResource(state.GetString(OwnerURL))
+	return resource.DirectoryPath(), nil
+}
+
 //HasResource check if patg/url to external resource exists
 func HasResource(source interface{}, state data.Map) (interface{}, error) {
-	var parentDirecotry = ""
+	var parentDirectory = ""
 	if state.Has(OwnerURL) {
-		var workflowPath = strings.Replace(state.GetString(OwnerURL), toolbox.FileSchema, "", 1)
-		parentDirecotry, _ = path.Split(workflowPath)
+		parentDirectory, _ = GetOwnerDirectory(state)
 	}
-
-	filename := path.Join(parentDirecotry, toolbox.AsString(source))
+	filename := path.Join(parentDirectory, toolbox.AsString(source))
 	var result = toolbox.FileExists(filename)
 	return result, nil
 }
@@ -71,13 +78,13 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 //LoadNeatly loads neatly document as data structure, source represents path to nearly document
 func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	var filename = toolbox.AsString(source)
+
 	if !strings.HasPrefix(filename, "/") {
-		var parentDirecotry = ""
+		var parentDirectory = ""
 		if state.Has(OwnerURL) {
-			var workflowPath = strings.Replace(state.GetString(OwnerURL), toolbox.FileSchema, "", 1)
-			parentDirecotry, _ = path.Split(workflowPath)
+			parentDirectory, _ = GetOwnerDirectory(state)
 		}
-		filename = path.Join(parentDirecotry, filename)
+		filename = path.Join(parentDirectory, filename)
 	}
 	if !toolbox.FileExists(filename) {
 		return nil, fmt.Errorf("File %v does not exists", filename)
@@ -87,8 +94,13 @@ func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	if !ok {
 		fmt.Errorf("failed to get neatly loader %T", state.Get(NeatlyDao))
 	}
+
+
 	var aMap = make(map[string]interface{})
-	err := dao.Load(state, documentResource, &aMap)
+	newState := data.NewMap()
+	newState.Put(OwnerURL, state.Get(OwnerURL));
+	newState.Put(NeatlyDao, state.Get(NeatlyDao));
+	err := dao.Load(newState, documentResource, &aMap)
 	return aMap, err
 }
 
