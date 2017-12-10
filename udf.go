@@ -64,6 +64,8 @@ func GetOwnerDirectory(state data.Map) (string, error) {
 	return resource.DirectoryPath(), nil
 }
 
+
+
 //HasResource check if patg/url to external resource exists
 func HasResource(source interface{}, state data.Map) (interface{}, error) {
 	var parentDirectory = ""
@@ -79,8 +81,9 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	var filename = toolbox.AsString(source)
 
+	var parentDirectory = ""
+
 	if !strings.HasPrefix(filename, "/") {
-		var parentDirectory = ""
 		if state.Has(OwnerURL) {
 			parentDirectory, _ = GetOwnerDirectory(state)
 		}
@@ -94,8 +97,6 @@ func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	if !ok {
 		fmt.Errorf("failed to get neatly loader %T", state.Get(NeatlyDao))
 	}
-
-
 	var aMap = make(map[string]interface{})
 	newState := data.NewMap()
 	newState.Put(OwnerURL, state.Get(OwnerURL));

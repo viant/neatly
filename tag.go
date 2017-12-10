@@ -69,7 +69,7 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 					continue
 				}
 				_, candidateName := toolbox.URLSplit(candidate.URL())
-				if strings.Contains(candidateName, leafDirectory) {
+				if strings.HasPrefix(candidateName, leafDirectory) {
 					if subPathParent != "" {
 						return path.Join(subPathParent, candidateName)
 					}

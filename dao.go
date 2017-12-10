@@ -133,6 +133,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		if isHeaderLine {
 			if hasActiveIterator {
 				if tag.Iterator.Next() {
+					context.tag.Subpath = ""
 					i = tag.LineNumber
 					continue
 				}
@@ -143,6 +144,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 			}
 			continue
 		}
+
 		record.Record = make(map[string]interface{})
 		err := decoder.Decode(record)
 		if err != nil {
@@ -152,6 +154,8 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 			context.virtualObjects = data.NewMap()
 			context.fieldIndex = make(map[string]int)
 			tag.setTagObject(context, record.Record)
+
+
 			if strings.Contains(line, "$") {
 				for k, v := range record.Record {
 					if !toolbox.IsString(v) {
@@ -160,6 +164,8 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 					record.Record[k] = d.expandMeta(context, toolbox.AsString(v))
 				}
 			}
+
+
 
 			for j := 1; j < len(record.Columns); j++ {
 				if recordHeight, err = d.processCell(context, record, lines, i, j, recordHeight, true); err != nil {
@@ -176,8 +182,8 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		i += recordHeight
 		var isLast = i+1 == len(lines)
 		if isLast && tag.HasActiveIterator() {
-
 			if tag.Iterator.Next() {
+				context.tag.Subpath = ""
 				i = tag.LineNumber
 				continue
 			}
