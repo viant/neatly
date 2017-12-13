@@ -209,9 +209,14 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 	field := NewField(fieldExpression)
 
 	value, has := record.Record[field.expression]
-	if !has || value == nil || toolbox.AsString(value) == "" {
+	if !has {
 		return recordHeight, nil
 	}
+
+	if ! field.IsArray && toolbox.AsString(value) == "" {
+		return recordHeight, nil
+	}
+
 	if (virtual && !field.IsVirtual) || (!virtual && field.IsVirtual) {
 		return recordHeight, nil
 	}
@@ -271,7 +276,9 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 			return recordHeight, err
 		}
 	}
-	field.Set(val, targetObject)
+	if val != nil {
+		field.Set(val, targetObject)
+	}
 
 	if ! field.IsVirtual && field.HasArrayComponent {
 		recordHeight, err = d.processArrayValues(context, field, recordIndex, lines, record, targetObject, recordHeight)
@@ -284,22 +291,27 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 	if field.HasArrayComponent {
 		var itemCount = 0
 		for k := recordIndex + 1; k < len(lines); k++ {
-			if !strings.HasPrefix(lines[k], ",") {
+			if !strings.HasPrefix(lines[k], ",")  {
 				break
 			}
+
 			arrayValueDecoder := d.factory.Create(strings.NewReader(lines[k]))
 			arrayItemRecord := &toolbox.DelimiteredRecord{
 				Columns:   record.Columns,
 				Delimiter: record.Delimiter,
 			}
 			err := arrayValueDecoder.Decode(arrayItemRecord)
+
 			if err != nil {
 				return 0, err
 			}
-			itemValue := arrayItemRecord.Record[field.expression]
-			if itemValue == nil || toolbox.AsString(itemValue) == "" {
+
+
+			if arrayItemRecord.IsEmpty(){
+
 				break
 			}
+			itemValue := arrayItemRecord.Record[field.expression]
 			itemCount++
 			val, err := d.normalizeValue(context, toolbox.AsString(itemValue))
 			if err != nil {
