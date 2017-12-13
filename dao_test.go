@@ -540,6 +540,60 @@ func TestDao_LoadUseCase13(t *testing.T) {
 }
 
 
+type UseCase14Action struct {
+	Send struct {
+		Udf string
+		Requests []struct {
+			Method string
+			URL    string
+		}
+	}
+	Expect []struct{
+		Code string
+	}
+}
+
+
+type UseCase14 struct {
+	Actions []*UseCase14Action
+}
+
+func TestDao_LoadUseCase14(t *testing.T) {
+
+
+	dao := neatly.NewDao("", "", "", nil)
+	var context= data.NewMap()
+
+	var useCase= &UseCase14{}
+	err := dao.Load(context, url.NewResource("test/use_case14.csv"), &useCase)
+
+	if assert.Nil(t, err) {
+		assert.EqualValues(t, 3, len(useCase.Actions))
+
+		assert.EqualValues(t, "MyUdf", useCase.Actions[0].Send.Udf)
+		assert.EqualValues(t, 2, len(useCase.Actions[0].Send.Requests))
+		assert.EqualValues(t, "http://127.0.0.1/path1", useCase.Actions[0].Send.Requests[0].URL)
+		assert.EqualValues(t, "http://127.0.0.1/path2", useCase.Actions[0].Send.Requests[1].URL)
+
+
+		assert.EqualValues(t, "MyUdf", useCase.Actions[1].Send.Udf)
+		if assert.EqualValues(t, 2, len(useCase.Actions[1].Send.Requests)) {
+			assert.EqualValues(t, "http://127.0.0.1/path3", useCase.Actions[1].Send.Requests[0].URL)
+			assert.EqualValues(t, "http://127.0.0.1/path4", useCase.Actions[1].Send.Requests[1].URL)
+		}
+
+		if assert.EqualValues(t, "MyUdf", useCase.Actions[2].Send.Udf) {
+			assert.EqualValues(t, 2, len(useCase.Actions[2].Send.Requests))
+			assert.EqualValues(t, "http://127.0.0.1/path5", useCase.Actions[2].Send.Requests[0].URL)
+			assert.EqualValues(t, "http://127.0.0.1/path6", useCase.Actions[2].Send.Requests[1].URL)
+		}
+
+
+	}
+
+}
+
+
 func TestMissingReference(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
 	var context = data.NewMap()

@@ -1,0 +1,11 @@
+Document,Actions,,,
+,%Actions,,,
+[]Actions,Send.Udf,Send.[]Requests.Method,Send.[]Requests.URL,[]Expect.Code
+,MyUdf,GET,http://127.0.0.1/path1,200
+,,GET,http://127.0.0.1/path2,404
+,,,,
+[]Actions,Send.Udf,Send.[]Requests.Method,Send.[]Requests.URL,[]Expect.Code
+,MyUdf,GET,http://127.0.0.1/path3,404
+,,GET,http://127.0.0.1/path4,200
+-,MyUdf,GET,http://127.0.0.1/path5,200
+,,GET,http://127.0.0.1/path6,200

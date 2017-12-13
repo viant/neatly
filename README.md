@@ -64,6 +64,9 @@ For instance
 **This** keyword used in field expression expands corresponding key/value directly to the current object tag.
 
 
+ 
+
+
 ## Neatly capabilities
 
 Use cases 
@@ -763,6 +766,104 @@ Neatly tabular representation.
 	b) owner resource path  without subpath and asset name
 	c) Local/remoteResourceRepo and asset name
 
+
+## Inline array use case
+
+
+   Take as example the following data structure:
+  
+   ```json
+{
+  "Actions": [
+    {
+      "Send": {
+        "Request": [
+          {
+            "Method": "GET",
+            "URL": "http://127.0.0.1/path1"
+          },
+          {
+            "Method": "GET",
+            "URL": "http://127.0.0.1/path2"
+          }
+        ],
+        "Udf": "MyUdf"
+      },
+      "Expect": [
+        {
+          "Code": 200
+        },
+        {
+          "Code": 404
+        }
+      ]
+    },
+    {
+      "Send": {
+        "Request": [
+          {
+            "Method": "GET",
+            "URL": "http://127.0.0.1/path3"
+          },
+          {
+            "Method": "GET",
+            "URL": "http://127.0.0.1/path4"
+          }
+        ],
+        "Udf": "MyUdf"
+      },
+      "Expect": [
+        {
+          "Code": 404
+        },
+        {
+          "Code": 200
+        }
+      ]
+    },
+    {
+          "Send": {
+            "Request": [
+              {
+                "Method": "GET",
+                "URL": "http://127.0.0.1/path5"
+              },
+              {
+                "Method": "GET",
+                "URL": "http://127.0.0.1/path6"
+              }
+            ],
+            "Udf": "MyUdf"
+          },
+          "Expect": [
+            {
+              "Code": 200
+            },
+            {
+              "Code": 200
+            }
+          ]
+        }
+  ]
+}
+```
+
+
+|Document |	Actions | | | |		
+| --- | --- | --- | --- | --- |	
+| |	%Actions | | | |			
+|[]Actions|Send.Udf|Send.[]Requests.Method|Send.[]Requests.URL|[]Expect.Code|
+| |	MyUdf|	GET	|http://127.0.0.1/path1 |200 | 
+|  | |	GET |	http://127.0.0.1/path2 | 404 |
+| | | | | |				
+|[]Actions|Send.Udf|Send.[]Requests.Method|Send.[]Requests.URL|[]Expect.Code|
+| |	MyUdf|	GET|	http://127.0.0.1/path3|	404|
+| |	|	GET|	http://127.0.0.1/path4|	200|
+|-| MyUdf|GET|http://127.0.0.1/path5|200|
+|	| |	GET|	http://127.0.0.1/path6|	200|
+
+
+If tag object field uses **[]** neatly will scan all rows down to add values to the array unless encounter next tag object or hyphen **'-'** in the first column.
 
 
 

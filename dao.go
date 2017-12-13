@@ -12,9 +12,13 @@ import (
 	"strings"
 )
 
-//OwnerURL represewnt currently loading netly URL
-const OwnerURL = "ownerURL"
-const NeatlyDao = "nearlyDAO"
+const (
+	//OwnerURL represewnt currently loading neatly URL
+	OwnerURL = "ownerURL"
+	//NeatlyDao nearly dao key
+	NeatlyDao = "nearlyDAO"
+	arrayRowTerminator = "-"
+)
 
 //Dao represents neatly data access object
 type Dao struct {
@@ -125,6 +129,9 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 	for i := 1; i < len(lines); i++ {
 		var recordHeight = 0
 		line := lines[i]
+		if strings.HasPrefix(line, arrayRowTerminator) { //replace array terminator
+			line = strings.Replace(line, arrayRowTerminator, "", 1)
+		}
 		var hasActiveIterator = tag.HasActiveIterator()
 		line = d.expandMeta(context, line)
 
@@ -155,7 +162,6 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 			context.fieldIndex = make(map[string]int)
 			tag.setTagObject(context, record.Record)
 
-
 			if strings.Contains(line, "$") {
 				for k, v := range record.Record {
 					if !toolbox.IsString(v) {
@@ -164,8 +170,6 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 					record.Record[k] = d.expandMeta(context, toolbox.AsString(v))
 				}
 			}
-
-
 
 			for j := 1; j < len(record.Columns); j++ {
 				if recordHeight, err = d.processCell(context, record, lines, i, j, recordHeight, true); err != nil {
@@ -233,7 +237,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 
 	var targetObject data.Map
 	if field.IsRoot {
-		if!  field.HasArrayComponent {
+		if !  field.HasArrayComponent {
 			setRootField(field, rootObject, val, 0)
 			return recordHeight, err
 		}
@@ -244,7 +248,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 		}
 
 		var index = context.fieldIndex[arrayPath]
-		if field.Leaf.IsArray  && toolbox.IsSlice(val) {
+		if field.Leaf.IsArray && toolbox.IsSlice(val) {
 			for _, item := range toolbox.AsSlice(val) {
 				setRootField(field, rootObject, item, index)
 				index++
