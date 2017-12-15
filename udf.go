@@ -39,6 +39,19 @@ func AsFloat(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.AsFloat(source), nil
 }
 
+
+//Length returns length of slice or string
+func Length(source interface{}, state data.Map) (interface{}, error) {
+	if toolbox.IsSlice(source) {
+		return len(toolbox.AsSlice(source)), nil
+	}
+	if text, ok := source.(string);ok {
+		return len(text), nil
+	}
+	return 0, nil
+}
+
+
 //AsBool converts source into bool
 func AsBool(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.AsBoolean(source), nil

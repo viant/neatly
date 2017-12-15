@@ -63,6 +63,7 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("AsBool", AsBool)
 	context.Put("HasResource", HasResource)
 	context.Put("Md5", Md5)
+	context.Put("Length", Length)
 	context.Put("LoadNeatly", LoadNeatly)
 }
 
