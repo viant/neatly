@@ -705,7 +705,7 @@ Builtin udf's
 6) Md5 generates md5 for provided parameter
 7) WorkingDirectory returns working directory joined with supplied sub path,  '../' is supported.
 8) LoadNeatly loads neatly document as data structure.
-9) Length returns length of slice or string
+9) Length returns length of slice, map or string
 
 ### External resources loading with virtual object value substitution use case.
 

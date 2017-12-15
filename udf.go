@@ -45,6 +45,9 @@ func Length(source interface{}, state data.Map) (interface{}, error) {
 	if toolbox.IsSlice(source) {
 		return len(toolbox.AsSlice(source)), nil
 	}
+	if toolbox.IsMap(source) {
+		return len(toolbox.AsMap(source)), nil
+	}
 	if text, ok := source.(string);ok {
 		return len(text), nil
 	}

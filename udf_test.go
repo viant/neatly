@@ -107,6 +107,15 @@ func Test_Length(t *testing.T) {
 		assert.Equal(t, 4, value)
 	}
 	{
+		value, err := neatly.Length(map[int]int{
+			2: 3,
+			1: 1,
+			6: 3,
+		}, nil)
+		assert.Nil(t, err)
+		assert.Equal(t, 3, value)
+	}
+	{
 		value, err := neatly.Length([]int{1,2,3}, nil)
 		assert.Nil(t, err)
 		assert.Equal(t, 3, value)
