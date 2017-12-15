@@ -16,7 +16,7 @@ const (
 	//OwnerURL represewnt currently loading neatly URL
 	OwnerURL = "ownerURL"
 	//NeatlyDao nearly dao key
-	NeatlyDao = "nearlyDAO"
+	NeatlyDao          = "nearlyDAO"
 	arrayRowTerminator = "-"
 )
 
@@ -291,7 +291,7 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 	if field.HasArrayComponent {
 		var itemCount = 0
 		for k := recordIndex + 1; k < len(lines); k++ {
-			if !strings.HasPrefix(lines[k], ",")  {
+			if !strings.HasPrefix(lines[k], ",") {
 				break
 			}
 
@@ -306,8 +306,7 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 				return 0, err
 			}
 
-
-			if arrayItemRecord.IsEmpty(){
+			if arrayItemRecord.IsEmpty() {
 
 				break
 			}
@@ -598,8 +597,10 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		//escape #
 		value = string(value[1:])
 	} else if strings.HasPrefix(value, "#") {
+		if len(virtualObjects) > 0 {
+			value = virtualObjects.ExpandAsText(value)
+		}
 		assets = strings.Split(value, "|")
-
 		mainAsset, err := d.loadExternalResource(context, assets[0])
 		if err != nil {
 			return nil, err
