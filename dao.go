@@ -534,7 +534,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 }
 
 func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string, error) {
-	resource, err := d.getExternalResource(context, assetURI)
+	resource, err := d.getExternalResource(context, strings.TrimSpace(assetURI))
 	var result string
 	if err == nil {
 		result, err = resource.DownloadText()
@@ -601,6 +601,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		if len(virtualObjects) > 0 {
 			value = virtualObjects.ExpandAsText(value)
 		}
+
 		assets = strings.Split(value, "|")
 		mainAsset, err := d.loadExternalResource(context, assets[0])
 		if err != nil {
