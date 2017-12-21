@@ -97,6 +97,7 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	object["TagId"] = t.TagId()
 }
 
+//TagId returns tag ID
 func (t *Tag) TagId() string {
 	var index = ""
 	if t.HasActiveIterator() {

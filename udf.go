@@ -69,6 +69,7 @@ func Md5(source interface{}, state data.Map) (interface{}, error) {
 	return result, nil
 }
 
+//GetOwnerDirectory returns owner neatly document directory
 func GetOwnerDirectory(state data.Map) (string, error) {
 	if !state.Has(OwnerURL) {
 		return "", fmt.Errorf("OwnerURL was empty")

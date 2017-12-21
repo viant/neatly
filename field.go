@@ -125,6 +125,7 @@ func (f *Field) ArrayPath() string {
 	return strings.Join(result, ".")
 }
 
+//GetArraySize  returns field array size
 func (f *Field) GetArraySize(value data.Map) int {
 	if !f.HasArrayComponent {
 		return 0

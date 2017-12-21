@@ -376,7 +376,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 	if err != nil {
 		return nil, err
 	}
-	exists, err := service.Exists(URL)
+	exists, _ := service.Exists(URL)
 	if !exists {
 		if d.remoteResourceRepo != "" {
 			fallbackResource, err := d.NewRepoResource(context.context, URI)
