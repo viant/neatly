@@ -454,7 +454,7 @@ func asJSONText(source interface{}) string {
 /*
 loadMap loads map for provided URI. If resource is a json or yaml object it will be converted into a map[string]interface{}
 index parameters publishes $arg{index} or $args{index} additional key value pairs, the fist one has full content of the resource, the latter
-has removed the first and last character. This is to provide ability to substiture with entire json object including {} or just content of the json object.
+has removed the first and last character. This is to provide ability to substitute with entire json object including {} or just content of the json object.
 */
 func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, index int) (data.Map, error) {
 	virtualObjects := context.virtualObjects
@@ -637,7 +637,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 	return result, err
 }
 
-//NewDao creates a new neatly format compatibile format data access object.
+//NewDao creates a new neatly format compatible format data access object.
 //It takes localResourceRepo, remoteResourceRepo, dataFormat and optionally delimiterDecoderFactory
 func NewDao(localResourceRepo, remoteResourceRepo, dataFormat string, delimiterDecoderFactory toolbox.DecoderFactory) *Dao {
 	if delimiterDecoderFactory == nil {
