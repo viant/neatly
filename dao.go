@@ -214,7 +214,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 		return recordHeight, nil
 	}
 
-	if ! field.IsArray && toolbox.AsString(value) == "" {
+	if !field.IsArray && toolbox.AsString(value) == "" {
 		return recordHeight, nil
 	}
 
@@ -243,7 +243,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 
 	var targetObject data.Map
 	if field.IsRoot {
-		if !  field.HasArrayComponent {
+		if !field.HasArrayComponent {
 			setRootField(field, rootObject, val, 0)
 			return recordHeight, err
 		}
@@ -281,7 +281,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 		field.Set(val, targetObject)
 	}
 
-	if ! field.IsVirtual && field.HasArrayComponent {
+	if !field.IsVirtual && field.HasArrayComponent {
 		recordHeight, err = d.processArrayValues(context, field, recordIndex, lines, record, targetObject, recordHeight)
 	}
 	return recordHeight, err
@@ -529,7 +529,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -550,11 +550,11 @@ func (d *Dao) asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {

@@ -39,7 +39,6 @@ func AsFloat(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.AsFloat(source), nil
 }
 
-
 //Length returns length of slice or string
 func Length(source interface{}, state data.Map) (interface{}, error) {
 	if toolbox.IsSlice(source) {
@@ -48,12 +47,11 @@ func Length(source interface{}, state data.Map) (interface{}, error) {
 	if toolbox.IsMap(source) {
 		return len(toolbox.AsMap(source)), nil
 	}
-	if text, ok := source.(string);ok {
+	if text, ok := source.(string); ok {
 		return len(text), nil
 	}
 	return 0, nil
 }
-
 
 //AsBool converts source into bool
 func AsBool(source interface{}, state data.Map) (interface{}, error) {
@@ -71,7 +69,6 @@ func Md5(source interface{}, state data.Map) (interface{}, error) {
 	return result, nil
 }
 
-
 func GetOwnerDirectory(state data.Map) (string, error) {
 	if !state.Has(OwnerURL) {
 		return "", fmt.Errorf("OwnerURL was empty")
@@ -79,8 +76,6 @@ func GetOwnerDirectory(state data.Map) (string, error) {
 	var resource = url.NewResource(state.GetString(OwnerURL))
 	return resource.DirectoryPath(), nil
 }
-
-
 
 //HasResource check if patg/url to external resource exists
 func HasResource(source interface{}, state data.Map) (interface{}, error) {
@@ -115,8 +110,8 @@ func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	}
 	var aMap = make(map[string]interface{})
 	newState := data.NewMap()
-	newState.Put(OwnerURL, state.Get(OwnerURL));
-	newState.Put(NeatlyDao, state.Get(NeatlyDao));
+	newState.Put(OwnerURL, state.Get(OwnerURL))
+	newState.Put(NeatlyDao, state.Get(NeatlyDao))
 	err := dao.Load(newState, documentResource, &aMap)
 	return aMap, err
 }

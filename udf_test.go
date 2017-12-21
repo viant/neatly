@@ -93,8 +93,6 @@ func Test_AsInt(t *testing.T) {
 	assert.Equal(t, 4, value)
 }
 
-
-
 func Test_Length(t *testing.T) {
 	{
 		value, err := neatly.Length(4.3, nil)
@@ -116,7 +114,7 @@ func Test_Length(t *testing.T) {
 		assert.Equal(t, 3, value)
 	}
 	{
-		value, err := neatly.Length([]int{1,2,3}, nil)
+		value, err := neatly.Length([]int{1, 2, 3}, nil)
 		assert.Nil(t, err)
 		assert.Equal(t, 3, value)
 	}

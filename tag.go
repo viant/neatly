@@ -52,14 +52,14 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 	var leafDirectory = ""
 	var subPathParent = ""
 	subPathElements := strings.Split(subpath, "/")
-		for  _, candidate := range subPathElements {
-			if strings.Contains(candidate, "*") {
-				leafDirectory = strings.Replace(candidate, "*", "", 1)
-				break
-			}
-			subPathParent = path.Join(subPathParent, candidate)
-			parentURL = toolbox.URLPathJoin(parentURL,candidate)
+	for _, candidate := range subPathElements {
+		if strings.Contains(candidate, "*") {
+			leafDirectory = strings.Replace(candidate, "*", "", 1)
+			break
 		}
+		subPathParent = path.Join(subPathParent, candidate)
+		parentURL = toolbox.URLPathJoin(parentURL, candidate)
+	}
 	storageService, err := storage.NewServiceForURL(parentURL, t.OwnerSource.Credential)
 	if err == nil {
 		candidates, err := storageService.List(parentURL)

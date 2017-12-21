@@ -108,14 +108,14 @@ func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
 }
 
 func (f *Field) ArrayPath() string {
-	if ! f.HasArrayComponent {
+	if !f.HasArrayComponent {
 		return ""
 	}
 	var result = make([]string, 0)
 	field := f
-	for ; ; {
+	for {
 		result = append(result, field.Field)
-		if field.IsArray || ! field.HasSubPath {
+		if field.IsArray || !field.HasSubPath {
 			break
 		}
 
@@ -125,11 +125,11 @@ func (f *Field) ArrayPath() string {
 }
 
 func (f *Field) GetArraySize(value data.Map) int {
-	if ! f.HasArrayComponent {
+	if !f.HasArrayComponent {
 		return 0
 	}
 	field := f
-	for ; ; {
+	for {
 		subValue := value.Get(field.Field)
 		if subValue == nil {
 			return 0
@@ -137,7 +137,7 @@ func (f *Field) GetArraySize(value data.Map) int {
 		if field.IsArray {
 			return len(toolbox.AsSlice(subValue))
 		}
-		if ! field.HasSubPath {
+		if !field.HasSubPath {
 			return 0
 		}
 
@@ -178,8 +178,6 @@ func NewField(expression string) *Field {
 		IsRoot:            isRoot,
 		IsVirtual:         isVirtual,
 	}
-
-
 
 	if result.HasSubPath {
 		dotPosition := strings.Index(parsedExpression, ".")

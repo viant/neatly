@@ -285,7 +285,7 @@ type UseCase7Item struct {
 }
 
 type UseCase7 struct {
-	Setup map[string]map[string][]map[string]interface{}
+	Setup    map[string]map[string][]map[string]interface{}
 	UseCases []*UseCase7Item
 }
 
@@ -507,7 +507,6 @@ func TestDao_LoadUseCase12(t *testing.T) {
 
 }
 
-
 type UseCase13 struct {
 	Prepare []struct {
 		TagId string
@@ -518,15 +517,15 @@ type UseCase13 struct {
 		Value         interface{}
 	}
 	Numbers struct {
-		Seq[]int
+		Seq []int
 	}
 }
 
 func TestDao_LoadUseCase13(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
-	var context= data.NewMap()
+	var context = data.NewMap()
 
-	var useCase= &UseCase13{}
+	var useCase = &UseCase13{}
 	err := dao.Load(context, url.NewResource("test/use_case13.csv"), &useCase)
 
 	if assert.Nil(t, err) {
@@ -539,20 +538,18 @@ func TestDao_LoadUseCase13(t *testing.T) {
 
 }
 
-
 type UseCase14Action struct {
 	Send struct {
-		Udf string
+		Udf      string
 		Requests []struct {
 			Method string
 			URL    string
 		}
 	}
-	Expect []struct{
+	Expect []struct {
 		Code string
 	}
 }
-
 
 type UseCase14 struct {
 	Actions []*UseCase14Action
@@ -560,11 +557,10 @@ type UseCase14 struct {
 
 func TestDao_LoadUseCase14(t *testing.T) {
 
-
 	dao := neatly.NewDao("", "", "", nil)
-	var context= data.NewMap()
+	var context = data.NewMap()
 
-	var useCase= &UseCase14{}
+	var useCase = &UseCase14{}
 	err := dao.Load(context, url.NewResource("test/use_case14.csv"), &useCase)
 
 	if assert.Nil(t, err) {
@@ -574,7 +570,6 @@ func TestDao_LoadUseCase14(t *testing.T) {
 		assert.EqualValues(t, 2, len(useCase.Actions[0].Send.Requests))
 		assert.EqualValues(t, "http://127.0.0.1/path1", useCase.Actions[0].Send.Requests[0].URL)
 		assert.EqualValues(t, "http://127.0.0.1/path2", useCase.Actions[0].Send.Requests[1].URL)
-
 
 		assert.EqualValues(t, "MyUdf", useCase.Actions[1].Send.Udf)
 		if assert.EqualValues(t, 2, len(useCase.Actions[1].Send.Requests)) {
@@ -588,11 +583,9 @@ func TestDao_LoadUseCase14(t *testing.T) {
 			assert.EqualValues(t, "http://127.0.0.1/path6", useCase.Actions[2].Send.Requests[1].URL)
 		}
 
-
 	}
 
 }
-
 
 func TestMissingReference(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
@@ -609,7 +602,6 @@ func TestBrokenJsonReference(t *testing.T) {
 	err := dao.Load(context, url.NewResource("test/broken2.csv"), &document)
 	assert.NotNil(t, err)
 }
-
 
 func TestBrokenExternalReference(t *testing.T) {
 	dao := neatly.NewDao("", "", "", nil)
