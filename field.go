@@ -107,6 +107,7 @@ func (f *Field) Set(value interface{}, target data.Map, indexes ...int) {
 	action(aMap, indexes...)
 }
 
+//ArrayPath returns a field array path
 func (f *Field) ArrayPath() string {
 	if !f.HasArrayComponent {
 		return ""
@@ -138,7 +139,7 @@ func (f *Field) GetArraySize(value data.Map) int {
 			return len(toolbox.AsSlice(subValue))
 		}
 		if !field.HasSubPath {
-			return 0
+			break
 		}
 
 		value = data.Map(toolbox.AsMap(subValue))

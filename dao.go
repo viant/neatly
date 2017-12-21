@@ -625,7 +625,6 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 			}
 			value = aMap.ExpandAsText(value)
 		}
-		value = value
 	}
 
 	result, err := d.asDataStructure(value)

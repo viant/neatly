@@ -106,7 +106,7 @@ func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	var documentResource = url.NewResource(filename)
 	var dao, ok = state.Get(NeatlyDao).(*Dao)
 	if !ok {
-		fmt.Errorf("failed to get neatly loader %T", state.Get(NeatlyDao))
+		return nil, fmt.Errorf("failed to get neatly loader %T", state.Get(NeatlyDao))
 	}
 	var aMap = make(map[string]interface{})
 	newState := data.NewMap()
