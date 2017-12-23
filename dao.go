@@ -581,6 +581,8 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 	replacementMap.Put("tag", context.tag.Name)
 	if context.tag.Subpath != "" {
 		replacementMap.Put("subPath", context.tag.Subpath)
+		var parent, _ = path.Split(context.source.ParsedURL.Path)
+		replacementMap.Put("path", path.Join(parent, context.tag.Subpath))
 	}
 	if context.tag.HasActiveIterator() {
 		replacementMap.Put("index", context.tag.Iterator.Index())

@@ -327,6 +327,8 @@ Note that number of digits in the upper bound range value creates a padding temp
 
 **$subPath** expands to current subPath if specified for the tag
 
+**$path** expands to current path if sub path is specified for the tag
+
 
 ### Data delegation and loading external resources use case
 
