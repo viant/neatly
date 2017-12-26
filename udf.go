@@ -113,6 +113,12 @@ func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	newState := data.NewMap()
 	newState.Put(OwnerURL, state.Get(OwnerURL))
 	newState.Put(NeatlyDao, state.Get(NeatlyDao))
+
+	for k, v := range state {
+		if toolbox.IsFunc(v) {
+			newState.Put(k, v)
+		}
+	}
 	err := dao.Load(newState, documentResource, &aMap)
 	return aMap, err
 }
