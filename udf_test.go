@@ -153,9 +153,17 @@ func Test_Zip_Unzip(t *testing.T) {
 	{
 		compressed, err := neatly.Zip("abc", nil)
 		assert.Nil(t, err)
-		origin, err := neatly.Unzip(compressed, nil)
-		assert.Nil(t, err)
-		assert.Equal(t, "abc", toolbox.AsString(origin))
+
+		{
+			origin, err := neatly.Unzip(compressed, nil)
+			assert.Nil(t, err)
+			assert.Equal(t, "abc", toolbox.AsString(origin))
+		}
+		{
+			origin, err := neatly.UnzipText(compressed, nil)
+			assert.Nil(t, err)
+			assert.Equal(t, "abc", origin)
+		}
 	}
 
 	{

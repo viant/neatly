@@ -190,6 +190,15 @@ func Unzip(source interface{}, state data.Map) (interface{}, error) {
 	return payload, err
 }
 
+//UnzipText uncompress supplied []byte into text or error
+func UnzipText(source interface{}, state data.Map) (interface{}, error) {
+	payload, err := Unzip(source, state)
+	if err != nil {
+		return nil, err
+	}
+	return toolbox.AsString(payload), nil
+}
+
 //Zip compresses supplied []byte or test or error
 func Zip(source interface{}, state data.Map) (interface{}, error) {
 	payload, ok := source.([]byte)
