@@ -148,3 +148,32 @@ func Test_FormatTime(t *testing.T) {
 	}
 
 }
+
+func Test_Zip_Unzip(t *testing.T) {
+	{
+		compressed, err := neatly.Zip("abc", nil)
+		assert.Nil(t, err)
+		origin, err := neatly.Unzip(compressed, nil)
+		assert.Nil(t, err)
+		assert.Equal(t, "abc", toolbox.AsString(origin))
+	}
+
+	{
+		compressed, err := neatly.Zip([]byte("abc"), nil)
+		assert.Nil(t, err)
+		origin, err := neatly.Unzip(compressed, nil)
+		assert.Nil(t, err)
+		assert.Equal(t, "abc", toolbox.AsString(origin))
+	}
+
+	{ //Error case
+		_, err := neatly.Zip(1, nil)
+		assert.NotNil(t, err)
+		_, err = neatly.Unzip(1, nil)
+		assert.NotNil(t, err)
+		_, err = neatly.Unzip([]byte{}, nil)
+		assert.NotNil(t, err)
+
+	}
+
+}

@@ -1,12 +1,16 @@
 package neatly
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/md5"
 	"fmt"
+	"github.com/klauspost/pgzip"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -167,4 +171,45 @@ func FormatTime(source interface{}, state data.Map) (interface{}, error) {
 		return nil, err
 	}
 	return timeValue.Format(timeLayout), nil
+}
+
+//Unzip uncompress supplied []byte or error
+func Unzip(source interface{}, state data.Map) (interface{}, error) {
+	payload, ok := source.([]byte)
+	if !ok {
+		return nil, fmt.Errorf("invalid Unzip input, expected %T, but had %T", []byte{}, source)
+	}
+	reader, err := pgzip.NewReader(bytes.NewReader(payload))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create gzip reader %v", err)
+	}
+	payload, err = ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read gzip reader %v", err)
+	}
+	return payload, err
+}
+
+//Zip compresses supplied []byte or test or error
+func Zip(source interface{}, state data.Map) (interface{}, error) {
+	payload, ok := source.([]byte)
+	if !ok {
+		if text, ok := source.(string); ok {
+			payload = []byte(text)
+		} else {
+			return nil, fmt.Errorf("invalid Zip input, expected %T, but had %T", []byte{}, source)
+		}
+	}
+	buffer := new(bytes.Buffer)
+	writer, err := pgzip.NewWriterLevel(buffer, gzip.BestSpeed)
+	if err != nil {
+		return nil, err
+	}
+	_, err = writer.Write(payload)
+	if err != nil {
+		return nil, fmt.Errorf("error in Zip, failed to write %v", err)
+	}
+	_ = writer.Flush()
+	err = writer.Close()
+	return buffer.Bytes(), err
 }
