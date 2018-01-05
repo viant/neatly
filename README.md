@@ -710,8 +710,8 @@ Builtin udf'
 8) LoadNeatly loads neatly document as data structure.
 9) Length returns length of slice, map or string
 9) FormatTime, takes two arguments, date or now, followed by java style date format
-10) Zip, takes []byte or string to compress.
-11) Unzip, takes []byte to uncompress.
+10) Zip, takes []byte or string to compress it.
+11) Unzip, takes []byte to uncompress it.
 
 ### External resources loading with virtual object value substitution use case.
 
