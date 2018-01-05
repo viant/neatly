@@ -8,6 +8,7 @@ import (
 	"github.com/viant/toolbox/url"
 	"strings"
 	"testing"
+	"time"
 )
 
 func Test_Md5(t *testing.T) {
@@ -118,4 +119,32 @@ func Test_Length(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, 3, value)
 	}
+}
+
+func Test_FormatTime(t *testing.T) {
+
+	{
+		value, err := neatly.FormatTime([]interface{}{"now", "yyyy"}, nil)
+		assert.Nil(t, err)
+		now := time.Now()
+		assert.Equal(t, now.Year(), toolbox.AsInt(value))
+	}
+	{
+		value, err := neatly.FormatTime([]interface{}{"2015-02-11", "yyyy"}, nil)
+		assert.Nil(t, err)
+		assert.Equal(t, 2015, toolbox.AsInt(value))
+	}
+	{
+		_, err := neatly.FormatTime([]interface{}{"2015-02-11"}, nil)
+		assert.NotNil(t, err)
+	}
+	{
+		_, err := neatly.FormatTime([]interface{}{"2015-02/11", "y-d"}, nil)
+		assert.NotNil(t, err)
+	}
+	{
+		_, err := neatly.FormatTime("a", nil)
+		assert.NotNil(t, err)
+	}
+
 }

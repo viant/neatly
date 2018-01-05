@@ -9,6 +9,7 @@ Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes
 
 - [Motivation](#Motivation)
 - [Neatly](#Neatly)
+- [User Defined Function](#udf)
 - [Usage](#Usage)
 - [License](#License)
 - [Credits and Acknowledgements](#Credits-and-Acknowledgements)
@@ -683,6 +684,7 @@ Where
 ```
 
 
+<a href="udf">&nbsp;</a>
 ### User defined functions (udf)
 
 The user defined system allowed to dynamically convert value from one form to another.
@@ -696,8 +698,7 @@ In order to define udf please use the follwoing function signature:
     type Udf func(interface{}, Map) (interface{}, error)
 
 ```
-
-Builtin udf's
+Builtin udf'
 
 1) AsMap
 2) AsInt
@@ -708,6 +709,8 @@ Builtin udf's
 7) WorkingDirectory returns working directory joined with supplied sub path,  '../' is supported.
 8) LoadNeatly loads neatly document as data structure.
 9) Length returns length of slice, map or string
+9) FormatTime, takes two arguments, date or now, followed by java style date format
+
 
 ### External resources loading with virtual object value substitution use case.
 

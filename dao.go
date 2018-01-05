@@ -65,6 +65,7 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("Md5", Md5)
 	context.Put("Length", Length)
 	context.Put("LoadNeatly", LoadNeatly)
+	context.Put("FormatTime", FormatTime)
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
