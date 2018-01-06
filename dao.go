@@ -91,8 +91,8 @@ func (d *Dao) processTag(context *tagContext) (err error) {
 }
 
 //processHeaderLine extract from LineNumber a tag from column[0], add deferredRefences for a tag, decodes fields from remaining column,
-func (d *Dao) processHeaderLine(context *tagContext, decoder toolbox.Decoder, lineNumber int) (*toolbox.DelimiteredRecord, *Tag, error) {
-	record := &toolbox.DelimiteredRecord{Delimiter: ","}
+func (d *Dao) processHeaderLine(context *tagContext, decoder toolbox.Decoder, lineNumber int) (*toolbox.DelimitedRecord, *Tag, error) {
+	record := &toolbox.DelimitedRecord{Delimiter: ","}
 	err := decoder.Decode(record)
 	if err != nil {
 		return nil, nil, err
@@ -107,8 +107,8 @@ func (d *Dao) processHeaderLine(context *tagContext, decoder toolbox.Decoder, li
 }
 
 //processHeaderLine extract from LineNumber a tag from column[0], add deferredRefences for a tag, decodes fields from remaining column,
-func (d *Dao) processRootHeaderLine(source *url.Resource, objectContainer data.Map, decoder toolbox.Decoder) (*toolbox.DelimiteredRecord, *Tag, error) {
-	record := &toolbox.DelimiteredRecord{Delimiter: ","}
+func (d *Dao) processRootHeaderLine(source *url.Resource, objectContainer data.Map, decoder toolbox.Decoder) (*toolbox.DelimitedRecord, *Tag, error) {
+	record := &toolbox.DelimitedRecord{Delimiter: ","}
 	err := decoder.Decode(record)
 	if err != nil {
 		return nil, nil, err
@@ -205,7 +205,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 	return rootObject, nil
 }
 
-func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord, lines []string, recordIndex, columnIndex int, recordHeight int, virtual bool) (int, error) {
+func (d *Dao) processCell(context *tagContext, record *toolbox.DelimitedRecord, lines []string, recordIndex, columnIndex int, recordHeight int, virtual bool) (int, error) {
 	fieldExpression := record.Columns[columnIndex]
 	if fieldExpression == "" {
 		return recordHeight, nil
@@ -292,7 +292,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimiteredRecord
 
 }
 
-func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex int, lines []string, record *toolbox.DelimiteredRecord, data data.Map, recordHeight int) (int, error) {
+func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex int, lines []string, record *toolbox.DelimitedRecord, data data.Map, recordHeight int) (int, error) {
 	if field.HasArrayComponent {
 		var itemCount = 0
 		for k := recordIndex + 1; k < len(lines); k++ {
@@ -301,7 +301,7 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 			}
 
 			arrayValueDecoder := d.factory.Create(strings.NewReader(lines[k]))
-			arrayItemRecord := &toolbox.DelimiteredRecord{
+			arrayItemRecord := &toolbox.DelimitedRecord{
 				Columns:   record.Columns,
 				Delimiter: record.Delimiter,
 			}
@@ -549,36 +549,6 @@ func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string
 	return result, err
 }
 
-func (d *Dao) asDataStructure(value string) (interface{}, error) {
-	if len(value) == 0 {
-		return nil, nil
-	}
-	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1 : len(value)-1]), nil
-	}
-
-	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1 : len(value)-1]), nil
-	}
-
-	if strings.HasPrefix(value, "{") {
-		var jsonObject = make(map[string]interface{})
-		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(value)).Decode(&jsonObject)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode: %v %T, %v", value, value, err)
-		}
-		return jsonObject, nil
-	} else if strings.HasPrefix(value, "[") {
-		var jsonArray = make([]interface{}, 0)
-		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(value)).Decode(&jsonArray)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode: %v %v", value, err)
-		}
-		return jsonArray, nil
-	}
-	return value, nil
-}
-
 func (d *Dao) expandMeta(context *tagContext, text string) string {
 	var replacementMap = data.NewMap()
 	replacementMap.Put("tagId", context.tag.TagId())
@@ -633,7 +603,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		}
 	}
 
-	result, err := d.asDataStructure(value)
+	result, err := asDataStructure(value)
 	if err == nil {
 		result = context.context.Expand(result)
 		if len(virtualObjects) > 0 {
