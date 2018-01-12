@@ -251,7 +251,7 @@ Note that root object uses **slash(/)** in the field name
 
 <a name="vobject"></a>
 
-###  Virtual Objects for data sharing use case.
+###  Virtual Objects for data sharing and delegation use case.
 
 The previous example address cohesion somehow, however we can see that empNo is repeated twice in the same row, 
 Op top of that bonus value uses json notation, which may not be too elegant.
@@ -268,7 +268,10 @@ Op top of that bonus value uses json notation, which may not be too elegant.
 In this case the virtual object emp was defined by 3 fields either lowercase or prefixed with colon (:) sing. 
 In order to reference virtual  object dollar sign expression is being used.
 
-### Loading repeated data with an object tag range expression use case.
+
+<a name="tagiterator"></a>
+
+### Loading repeated data with an object tag iterator range expression use case.
 
 
    Take as example the following data structure:
