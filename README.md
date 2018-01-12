@@ -249,6 +249,8 @@ In this case "Bonus filed" on Merits tag is actual root object field reference.
 Cohesion has been achieved by placing  data related the same employee in the same row.
 Note that root object uses **slash(/)** in the field name
 
+<a name="vobject"></a>
+
 ###  Virtual Objects for data sharing use case.
 
 The previous example address cohesion somehow, however we can see that empNo is repeated twice in the same row, 
@@ -263,8 +265,8 @@ Op top of that bonus value uses json notation, which may not be too elegant.
 | |	$emp.EmpNo |	Reduced cost by 30% | $emp | 2 |  Kowalczyk | 8000 |
 | |	$emp.EmpNo |	Improved resource reusibility by 40% | $emp | 3 | Schmidt |4000 |
 
-In this case the virtual object emp was defined by 3 fields prefixed with colon(:) sing. In order to reference virtual 
-object dollar sign expression is being used.
+In this case the virtual object emp was defined by 3 fields either lowercase or prefixed with colon (:) sing. 
+In order to reference virtual  object dollar sign expression is being used.
 
 ### Loading repeated data with an object tag range expression use case.
 
