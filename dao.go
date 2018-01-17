@@ -19,6 +19,8 @@ const (
 	arrayRowTerminator = "-"
 )
 
+var commonResourceExtensions =[]string{".json", ".yaml", ".txt", ".csv", ".md",}
+
 //Dao represents neatly data access object
 type Dao struct {
 	localResourceRepo  string
@@ -382,6 +384,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 		return nil, err
 	}
 	exists, _ := service.Exists(URL)
+
 	if !exists {
 		if d.remoteResourceRepo != "" {
 			fallbackResource, err := d.NewRepoResource(context.context, URI)
@@ -409,12 +412,32 @@ func buildURLWithOwnerURL(owner *url.Resource, subpath string, URI string) (stri
 	if subpath != "" {
 		fileCandidate := toolbox.URLPathJoin(ownerURL, path.Join(subpath, URI))
 		fileCandidate = strings.Replace(fileCandidate, toolbox.FileSchema, "", 1)
+
 		if toolbox.FileExists(fileCandidate) {
 			URL = toolbox.FileSchema + fileCandidate
+		} else if path.Ext(fileCandidate) == "" {
+			for _, ext := range commonResourceExtensions {
+				if toolbox.FileExists(fileCandidate + ext) {
+					URL = toolbox.FileSchema + fileCandidate + ext
+					break
+				}
+			}
 		}
 	}
 	if URL == "" {
 		URL = toolbox.URLPathJoin(ownerURL, URI)
+
+		service, err := storage.NewServiceForURL(URL, owner.Credential)
+		if err == nil {
+			if exists, _ := service.Exists(URL); !exists {
+				for _, ext := range commonResourceExtensions {
+					exists, _ := service.Exists(URL + ext)
+					if exists {
+						URL = URL + ext
+					}
+				}
+			}
+		}
 	}
 	return ownerURL, URL
 }
@@ -533,7 +556,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
