@@ -68,6 +68,7 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("Zip", Zip)
 	context.Put("Unzip", Unzip)
 	context.Put("UnzipText", UnzipText)
+	context.Put("Markdown", Markdown)
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
@@ -531,7 +532,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 

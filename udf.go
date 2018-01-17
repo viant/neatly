@@ -9,6 +9,7 @@ import (
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
+	"gopkg.in/russross/blackfriday.v2"
 	"io"
 	"io/ioutil"
 	"os"
@@ -221,4 +222,11 @@ func Zip(source interface{}, state data.Map) (interface{}, error) {
 	_ = writer.Flush()
 	err = writer.Close()
 	return buffer.Bytes(), err
+}
+
+//Markdown returns html fot supplied markdown
+func Markdown(source interface{}, state data.Map) (interface{}, error) {
+	var input = toolbox.AsString(source)
+	result := blackfriday.Run([]byte(input))
+	return string(result), nil
 }

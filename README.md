@@ -718,6 +718,7 @@ Builtin udf'
 10) Zip, takes []byte or string to compress it.
 11) Unzip, takes []byte to uncompress it into []byte.
 12) UnzipText takes []byte to uncompress it into string.
+13) Markdown generate HTML for suppied markdown
 
 ### External resources loading with virtual object value substitution use case.
 

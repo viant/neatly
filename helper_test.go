@@ -1,9 +1,9 @@
 package neatly
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/toolbox"
+	"testing"
 )
 
 func Test_asDataStructure(t *testing.T) {

@@ -185,3 +185,13 @@ func Test_Zip_Unzip(t *testing.T) {
 	}
 
 }
+
+func Test_Markdown(t *testing.T) {
+	{
+
+		html, err := neatly.Markdown("*Hello*", nil)
+		assert.Nil(t, err)
+		assert.EqualValues(t, "<p><em>Hello</em></p>\n", html)
+
+	}
+}

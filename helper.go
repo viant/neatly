@@ -1,9 +1,9 @@
 package neatly
 
 import (
-	"strings"
-	"github.com/viant/toolbox"
 	"fmt"
+	"github.com/viant/toolbox"
+	"strings"
 )
 
 func IsCompleteJSON(candidate string) bool {
@@ -28,18 +28,18 @@ func asDataStructure(value string) (interface{}, error) {
 		return nil, nil
 	}
 	if strings.HasPrefix(value, "{{") || strings.HasSuffix(value, "}}") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "[[") || strings.HasSuffix(value, "]]") {
-		return string(value[1: len(value)-1]), nil
+		return string(value[1 : len(value)-1]), nil
 	}
 
 	if strings.HasPrefix(value, "{") {
 		if toolbox.IsNewLineDelimitedJSON(value) {
 			return value, nil
 		}
-		jsonFactory := toolbox.NewJSONDecoderFactory();
+		jsonFactory := toolbox.NewJSONDecoderFactory()
 		var jsonObject = make(map[string]interface{})
 		err := jsonFactory.Create(strings.NewReader(value)).Decode(&jsonObject)
 		if err != nil {
