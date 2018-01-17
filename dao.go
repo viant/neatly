@@ -2,7 +2,6 @@ package neatly
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
@@ -426,12 +425,13 @@ func (d *Dao) NewRepoResource(context data.Map, URI string) (*url.Resource, erro
 	var localResourceURL = fmt.Sprintf(d.localResourceRepo, URI)
 	var localResource = url.NewResource(localResourceURL)
 
-	if toolbox.FileExists(localResource.ParsedURL.Path) {
-		return url.NewResource(localResourceURL), nil
-	}
 	var localService, err = storage.NewServiceForURL(localResourceURL, "")
 	if err != nil {
 		return nil, err
+	}
+
+	if exits, _ := localService.Exists(localResource.URL); exits {
+		return url.NewResource(localResourceURL), nil
 	}
 	var remoteResourceURL = fmt.Sprintf(d.remoteResourceRepo, URI)
 	remoteService, err := storage.NewServiceForURL(remoteResourceURL, "")
@@ -447,10 +447,9 @@ func asJSONText(source interface{}) string {
 	if source == nil {
 		return ""
 	}
-	var buf = new(bytes.Buffer)
-	err := toolbox.NewJSONEncoderFactory().Create(buf).Encode(source)
+	result, err := toolbox.AsJSONText(source)
 	if err == nil {
-		return buf.String()
+		return result
 	}
 	return toolbox.AsString(source)
 }
@@ -513,12 +512,11 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 				continue
 			}
 			if toolbox.IsMap(v) || toolbox.IsSlice(v) {
-				buf := new(bytes.Buffer)
-				err := toolbox.NewJSONEncoderFactory().Create(buf).Encode(v)
+				text, err := toolbox.AsJSONText(v)
 				if err != nil {
 					return nil, err
 				}
-				v = buf.String()
+				v = text
 			}
 			if toolbox.IsString(v) {
 				textValue := toolbox.AsString(v)
@@ -533,7 +531,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
