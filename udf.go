@@ -98,9 +98,7 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 //LoadNeatly loads neatly document as data structure, source represents path to nearly document
 func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
 	var filename = toolbox.AsString(source)
-
 	var parentDirectory = ""
-
 	if !strings.HasPrefix(filename, "/") {
 		if state.Has(OwnerURL) {
 			parentDirectory, _ = GetOwnerDirectory(state)
@@ -229,4 +227,26 @@ func Markdown(source interface{}, state data.Map) (interface{}, error) {
 	var input = toolbox.AsString(source)
 	result := blackfriday.Run([]byte(input))
 	return string(result), nil
+}
+
+//Cat returns content of supplied file name
+func Cat(source interface{}, state data.Map) (interface{}, error) {
+	var parentDirectory = ""
+	if state.Has(OwnerURL) {
+		parentDirectory, _ = GetOwnerDirectory(state)
+	}
+	filename := path.Join(parentDirectory, toolbox.AsString(source))
+	if !toolbox.FileExists(filename) {
+		return nil, fmt.Errorf("no such file or directory %v", filename)
+	}
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	return string(content), nil
 }

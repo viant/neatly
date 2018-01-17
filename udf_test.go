@@ -192,6 +192,17 @@ func Test_Markdown(t *testing.T) {
 		assert.Nil(t, err)
 		assert.EqualValues(t, "<p><em>Hello</em></p>\n", html)
 	}
+
 }
 
-
+func Test_Cat(t *testing.T) {
+	{
+		content, err := neatly.Cat("udf.go", nil)
+		assert.Nil(t, err)
+		assert.True(t, content != "")
+	}
+	{
+		_, err := neatly.Cat("uaaadf.go", nil)
+		assert.NotNil(t, err)
+	}
+}

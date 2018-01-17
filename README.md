@@ -719,6 +719,7 @@ Builtin udf'
 11) Unzip, takes []byte to uncompress it into []byte.
 12) UnzipText takes []byte to uncompress it into string.
 13) Markdown generate HTML for suppied markdown
+14) Cat returns content of supplied filename
 
 ### External resources loading with virtual object value substitution use case.
 
