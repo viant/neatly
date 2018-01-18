@@ -71,7 +71,7 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("Unzip", Unzip)
 	context.Put("UnzipText", UnzipText)
 	context.Put("Markdown", Markdown)
-	context.Put("Cat", Markdown)
+	context.Put("Cat", Cat)
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
