@@ -205,4 +205,12 @@ func Test_Cat(t *testing.T) {
 		_, err := neatly.Cat("uaaadf.go", nil)
 		assert.NotNil(t, err)
 	}
+	{
+		content, err := neatly.Cat("test/../udf.go", nil)
+		assert.Nil(t, err)
+		assert.True(t, content != "")
+	}
 }
+
+
+

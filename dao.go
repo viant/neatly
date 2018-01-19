@@ -19,7 +19,7 @@ const (
 	arrayRowTerminator = "-"
 )
 
-var commonResourceExtensions =[]string{".json", ".yaml", ".txt", ".csv", ".md",}
+var commonResourceExtensions = []string{".json", ".yaml", ".txt", ".csv", ".md",}
 
 //Dao represents neatly data access object
 type Dao struct {
@@ -394,6 +394,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 					URL = fallbackResource.URL
 
 				}
+
 			}
 		}
 		if !exists && context.tag.Subpath != "" {
@@ -454,7 +455,13 @@ func (d *Dao) NewRepoResource(context data.Map, URI string) (*url.Resource, erro
 	if err != nil {
 		return nil, err
 	}
-
+	if path.Ext(localResource.URL) == "" {
+		for _, ext := range commonResourceExtensions {
+			if exists, _ := localService.Exists(localResource.URL + ext); exists {
+				return url.NewResource(localResource.URL + ext), nil
+			}
+		}
+	}
 	if exits, _ := localService.Exists(localResource.URL); exits {
 		return url.NewResource(localResourceURL), nil
 	}

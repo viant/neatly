@@ -16,6 +16,7 @@ import (
 	"path"
 	"strings"
 	"time"
+	"github.com/viant/toolbox/storage"
 )
 
 //AsMap converts source into map
@@ -225,6 +226,10 @@ func Zip(source interface{}, state data.Map) (interface{}, error) {
 //Markdown returns html fot supplied markdown
 func Markdown(source interface{}, state data.Map) (interface{}, error) {
 	var input = toolbox.AsString(source)
+	response, err := Cat(input, state)
+	if err == nil && response != nil {
+		input = toolbox.AsString(response)
+	}
 	result := blackfriday.Run([]byte(input))
 	return string(result), nil
 }
@@ -237,6 +242,18 @@ func Cat(source interface{}, state data.Map) (interface{}, error) {
 	}
 	filename := path.Join(parentDirectory, toolbox.AsString(source))
 	if !toolbox.FileExists(filename) {
+		var resource = url.NewResource(state.GetString(OwnerURL))
+		parentURL, _ := toolbox.URLSplit(resource.URL)
+		var URL = toolbox.URLPathJoin(parentURL, toolbox.AsString(source))
+		service, err := storage.NewServiceForURL(URL, "")
+		if err == nil {
+			if exists, _ := service.Exists(URL); exists {
+				resource = url.NewResource(URL)
+				if text, err := resource.DownloadText(); err == nil {
+					return text, nil
+				}
+			}
+		}
 		return nil, fmt.Errorf("no such file or directory %v", filename)
 	}
 	file, err := os.Open(filename)
