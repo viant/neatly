@@ -246,7 +246,6 @@ func removeEmptyElements(tagObject map[string]interface{}) {
 			if isMapValueEmpty(element) {
 					emptyCount++
 			} else {
-				removeEmptyElements(element)
 				break
 			}
 		}
