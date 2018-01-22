@@ -189,6 +189,8 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 					return nil, err
 				}
 			}
+
+			removeEmptyElements(context.tagObject)
 		}
 
 		i += recordHeight
@@ -207,6 +209,54 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 	}
 	return rootObject, nil
 }
+
+
+
+func isMapValueEmpty(aMap map[string]interface{}) bool {
+	for _, v := range aMap {
+		if v == nil {
+			continue
+		}
+		var textValue = toolbox.AsString(v)
+		if textValue == "" || textValue == "<nil>"{
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+
+//removeEmptyElements remove empty slice element from the end
+func removeEmptyElements(tagObject map[string]interface{}) {
+	for k, v := range tagObject {
+		if toolbox.IsMap(v) {
+			removeEmptyElements(toolbox.AsMap(v))
+		}
+		if ! toolbox.IsSlice(v) {
+			continue
+		}
+		aSlice := toolbox.AsSlice(v)
+		var emptyCount = 0
+		for i := len(aSlice) - 1; i >= 0;i-- {
+			if !toolbox.IsMap(aSlice[i]) {
+				break;
+			}
+			element := toolbox.AsMap(aSlice[i])
+			if isMapValueEmpty(element) {
+					emptyCount++
+			} else {
+				removeEmptyElements(element)
+				break
+			}
+		}
+		if emptyCount > 0 {
+			tagObject[k] = aSlice[:len(aSlice)-emptyCount]
+		}
+	}
+}
+
+
 
 func (d *Dao) processCell(context *tagContext, record *toolbox.DelimitedRecord, lines []string, recordIndex, columnIndex int, recordHeight int, virtual bool) (int, error) {
 	fieldExpression := record.Columns[columnIndex]
@@ -318,9 +368,6 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 				break
 			}
 			itemValue := arrayItemRecord.Record[field.expression]
-			if itemValue == "" || itemValue == nil {
-				continue
-			}
 			itemCount++
 			val, err := d.normalizeValue(context, toolbox.AsString(itemValue))
 			if err != nil {
