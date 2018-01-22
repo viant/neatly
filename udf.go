@@ -8,6 +8,7 @@ import (
 	"github.com/klauspost/pgzip"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
+	"github.com/viant/toolbox/storage"
 	"github.com/viant/toolbox/url"
 	"gopkg.in/russross/blackfriday.v2"
 	"io"
@@ -16,7 +17,6 @@ import (
 	"path"
 	"strings"
 	"time"
-	"github.com/viant/toolbox/storage"
 )
 
 //AsMap converts source into map

@@ -6,22 +6,8 @@ import (
 	"strings"
 )
 
-func IsCompleteJSON(candidate string) bool {
-	candidate = strings.TrimSpace(candidate)
-	if candidate == "" {
-		return false
-	}
-	curlyStart := strings.Count(candidate, "{")
-	curlyEnd := strings.Count(candidate, "}")
-	squareStart := strings.Count(candidate, "[")
-	squareEnd := strings.Count(candidate, "]")
-	if !(curlyStart == curlyEnd && squareStart == squareEnd) {
-		return false
-	}
-	var aMap = make(map[string]interface{})
-	err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(candidate)).Decode(&aMap)
-	return err == nil
-}
+
+
 
 func asDataStructure(value string) (interface{}, error) {
 	if len(value) == 0 {

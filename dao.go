@@ -19,7 +19,7 @@ const (
 	arrayRowTerminator = "-"
 )
 
-var commonResourceExtensions = []string{".json", ".yaml", ".txt", ".csv", ".md",}
+var commonResourceExtensions = []string{".json", ".yaml", ".txt", ".csv", ".md"}
 
 //Dao represents neatly data access object
 type Dao struct {
@@ -245,7 +245,7 @@ func (d *Dao) processCell(context *tagContext, record *toolbox.DelimitedRecord, 
 	}
 	val, err := d.normalizeValue(context, textValue)
 	if err != nil {
-		return recordHeight, fmt.Errorf("%v - failed to normalizeValue %v, %v", context.tag.TagId(), textValue, err)
+		return recordHeight, fmt.Errorf("%v - failed to normalizeValue %v, %v", context.tag.TagID(), textValue, err)
 	}
 
 	var targetObject data.Map
@@ -563,7 +563,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -581,7 +581,7 @@ func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string
 
 func (d *Dao) expandMeta(context *tagContext, text string) string {
 	var replacementMap = data.NewMap()
-	replacementMap.Put("tagId", context.tag.TagId())
+	replacementMap.Put("tagId", context.tag.TagID())
 	replacementMap.Put("tag", context.tag.Name)
 	if context.tag.Subpath != "" {
 		replacementMap.Put("subPath", context.tag.Subpath)

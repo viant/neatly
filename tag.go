@@ -20,7 +20,7 @@ type Tag struct {
 	Iterator      *TagIterator
 	LineNumber    int
 	Subpath       string
-	TagIdTemplate string
+	TagIDTemplate string
 }
 
 //HasActiveIterator returns true if tag has active iterator
@@ -94,16 +94,16 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	if t.Subpath != "" {
 		object["Subpath"] = t.Subpath
 	}
-	object["TagId"] = t.TagId()
+	object["TagID"] = t.TagID()
 }
 
-//TagId returns tag ID
-func (t *Tag) TagId() string {
+//TagID returns tag ID
+func (t *Tag) TagID() string {
 	var index = ""
 	if t.HasActiveIterator() {
 		index = t.Iterator.Index()
 	}
-	value := fmt.Sprintf(t.TagIdTemplate, index, t.Subpath)
+	value := fmt.Sprintf(t.TagIDTemplate, index, t.Subpath)
 	var result = make([]byte, 0)
 	for _, r := range value {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
@@ -126,6 +126,6 @@ func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber 
 		result.Name = string(key[2:])
 		result.IsArray = true
 	}
-	result.TagIdTemplate = ownerName + result.Name + "%v%v"
+	result.TagIDTemplate = ownerName + result.Name + "%v%v"
 	return result
 }

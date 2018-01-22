@@ -211,6 +211,3 @@ func Test_Cat(t *testing.T) {
 		assert.True(t, content != "")
 	}
 }
-
-
-
