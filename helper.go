@@ -6,9 +6,6 @@ import (
 	"strings"
 )
 
-
-
-
 func asDataStructure(value string) (interface{}, error) {
 	if len(value) == 0 {
 		return nil, nil

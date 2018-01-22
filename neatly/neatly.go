@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/viant/neatly"
+	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
 	"gopkg.in/yaml.v2"
@@ -17,6 +18,7 @@ func init() {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	flag.String("i", "", "<neatly document path> ")
 	flag.String("f", "json", "<output format> json or yaml")
+	flag.Bool("v", false, "neatly version")
 
 }
 
@@ -42,6 +44,13 @@ func main() {
 	flag.Visit(func(f *flag.Flag) {
 		flagset[f.Name] = f.Value.String()
 	})
+
+	version, ok := flagset["v"]
+	if toolbox.AsBoolean(version) {
+		fmt.Printf("%v %v\n", neatly.AppName, neatly.AppVersion)
+		return
+	}
+
 	input, ok := flagset["i"]
 	if !ok {
 		flag.PrintDefaults()

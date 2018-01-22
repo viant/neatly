@@ -319,6 +319,13 @@ In this case Repeted tag uses **Tag Range** expression  **{  }**, which repeats 
 
 #### Variable substitution
 
+
+#### Variable substitution rules
+1)  '$' path expression will be only substituted if path is present in the current context
+2)  UDF wil be substituted only if it returns no error and in case it takes $ expression as parameter, expression path is present in context.
+
+
+
 **$index** / ${index} is a special/reserved keyword in this context it would expand to 01 in the firs iteration followed by 02, 03, 04 and 05.
 If there are more than one value row, all can be expanded to the same index value within the same iteration.
 
