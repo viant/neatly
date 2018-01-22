@@ -315,10 +315,12 @@ func (d *Dao) processArrayValues(context *tagContext, field *Field, recordIndex 
 			}
 
 			if arrayItemRecord.IsEmpty() {
-
 				break
 			}
 			itemValue := arrayItemRecord.Record[field.expression]
+			if itemValue == "" || itemValue == nil {
+				continue
+			}
 			itemCount++
 			val, err := d.normalizeValue(context, toolbox.AsString(itemValue))
 			if err != nil {
