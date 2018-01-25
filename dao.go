@@ -210,15 +210,13 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 	return rootObject, nil
 }
 
-
-
 func isMapValueEmpty(aMap map[string]interface{}) bool {
 	for _, v := range aMap {
 		if v == nil {
 			continue
 		}
 		var textValue = toolbox.AsString(v)
-		if textValue == "" || textValue == "<nil>"{
+		if textValue == "" || textValue == "<nil>" {
 			continue
 		}
 		return false
@@ -226,25 +224,24 @@ func isMapValueEmpty(aMap map[string]interface{}) bool {
 	return true
 }
 
-
 //removeEmptyElements remove empty slice element from the end
 func removeEmptyElements(tagObject map[string]interface{}) {
 	for k, v := range tagObject {
 		if toolbox.IsMap(v) {
 			removeEmptyElements(toolbox.AsMap(v))
 		}
-		if ! toolbox.IsSlice(v) {
+		if !toolbox.IsSlice(v) {
 			continue
 		}
 		aSlice := toolbox.AsSlice(v)
 		var emptyCount = 0
-		for i := len(aSlice) - 1; i >= 0;i-- {
+		for i := len(aSlice) - 1; i >= 0; i-- {
 			if !toolbox.IsMap(aSlice[i]) {
-				break;
+				break
 			}
 			element := toolbox.AsMap(aSlice[i])
 			if isMapValueEmpty(element) {
-					emptyCount++
+				emptyCount++
 			} else {
 				break
 			}
@@ -254,8 +251,6 @@ func removeEmptyElements(tagObject map[string]interface{}) {
 		}
 	}
 }
-
-
 
 func (d *Dao) processCell(context *tagContext, record *toolbox.DelimitedRecord, lines []string, recordIndex, columnIndex int, recordHeight int, virtual bool) (int, error) {
 	fieldExpression := record.Columns[columnIndex]

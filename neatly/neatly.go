@@ -27,7 +27,7 @@ func printJSON(aMap map[string]interface{}) {
 	if err != nil {
 		log.Fatal("failed to build JSON")
 	}
-	fmt.Printf("%s", buf)
+	fmt.Printf("%s\n", buf)
 }
 
 func printYAML(aMap map[string]interface{}) {
@@ -35,7 +35,7 @@ func printYAML(aMap map[string]interface{}) {
 	if err != nil {
 		log.Fatal("failed to build JSON")
 	}
-	fmt.Printf("%s", buf)
+	fmt.Printf("%s\n", buf)
 }
 
 func main() {

@@ -144,6 +144,9 @@ func WorkingDirectory(source interface{}, state data.Map) (interface{}, error) {
 			subPath = string(subPath[3:])
 		}
 	}
+	if subPath == "" {
+		return currentDirectory, nil
+	}
 	return path.Join(currentDirectory, subPath), nil
 }
 
