@@ -8,6 +8,7 @@ This library is compatible with Go 1.8+
 Please refer to [`CHANGELOG.md`](CHANGELOG.md) if you encounter breaking changes.
 
 - [Motivation](#Motivation)
+- [Getting started](https://github.com/adrianwit/neatly-introduction)
 - [Neatly](#Neatly)
 - [User Defined Function](#udf)
 - [Usage](#Usage)
