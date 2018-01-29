@@ -294,7 +294,7 @@ func TestDao_LoadUseCase7(t *testing.T) {
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case7.csv"), useCase7)
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
@@ -336,7 +336,7 @@ func TestDao_LoadUseCase8(t *testing.T) {
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case8.csv"), useCase7)
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
@@ -378,7 +378,7 @@ func TestDao_LoadUseCase9(t *testing.T) {
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case9.csv"), useCase7)
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
@@ -420,7 +420,7 @@ func TestDao_LoadUseCase10(t *testing.T) {
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case10.csv"), useCase7)
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
@@ -464,7 +464,7 @@ func TestDao_LoadUseCase11(t *testing.T) {
 	err := dao.Load(context, url.NewResource("test/use_case11.csv"), useCase7)
 
 	assert.Nil(t, err)
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		return
 	}
 	for i := 0; i < 2; i++ {

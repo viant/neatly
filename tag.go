@@ -55,14 +55,14 @@ func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}, i
 
 	/*
 
-	tagName  string
-	tagIndex string
-	Subpath string
-	tagID string
+		tagName  string
+		tagIndex string
+		Subpath string
+		tagID string
 
 
 
-	 */
+	*/
 
 	if includeMeta {
 		t.setMeta(result, record)

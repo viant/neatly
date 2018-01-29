@@ -571,7 +571,6 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 
-
 	assetContent = d.expandMeta(context, assetContent)
 	assetContent = strings.Trim(assetContent, " \t\n\r")
 
@@ -615,7 +614,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -647,18 +646,13 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 	return replacementMap.ExpandAsText(text)
 }
 
-
-
-
-
 func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, error) {
 	virtualObjects := context.virtualObjects
 	var assets []string
-	value, unescaped:= unescapeSpecialCharacters(value)
+	value, unescaped := unescapeSpecialCharacters(value)
 	if unescaped {
 		return value, nil
 	}
-
 
 	if strings.HasPrefix(value, "$") {
 		return virtualObjects.Expand(value), nil

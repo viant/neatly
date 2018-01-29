@@ -38,7 +38,6 @@ func Test_asDataStructure(t *testing.T) {
 	}
 }
 
-
 func Test_getAssetURIs(t *testing.T) {
 
 	assert.EqualValues(t, []string{"a", "c", "z"}, getAssetURIs("a|c|z"))

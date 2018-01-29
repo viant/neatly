@@ -8,7 +8,7 @@ import (
 
 func unescapeSpecialCharacters(input string) (string, bool) {
 	result := strings.TrimSpace(input)
-	unescaped := false;
+	unescaped := false
 	if len(input) < 2 {
 		return input, unescaped
 	}
@@ -67,10 +67,9 @@ func asDataStructure(value string) (interface{}, error) {
 	return value, nil
 }
 
-
 func getAssetURIs(value string) []string {
 	var separator = " "
-	if strings.Contains(value, "[") || strings.Contains(value, "{", ) {
+	if strings.Contains(value, "[") || strings.Contains(value, "{") {
 		separator = "|"
 	}
 	if separator != "|" {
