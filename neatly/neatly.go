@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/viant/neatly"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
 	"gopkg.in/yaml.v2"
-	"log"
-	"os"
-	"strings"
 )
 
 func init() {
@@ -62,7 +63,7 @@ func main() {
 	dao := neatly.NewDao(toolbox.AsBoolean(flag.Lookup("m").Value.String()), "", "", "", nil)
 	err := dao.Load(context, url.NewResource(input), &neatlyDocument)
 	if err != nil {
-		log.Fatal("failed to loead neatly document: %v %v\n", input, err)
+		log.Fatal("failed to load neatly document: %v %v\n", input, err)
 	}
 	switch strings.ToLower(flag.Lookup("f").Value.String()) {
 	case "json":
