@@ -23,6 +23,7 @@ var commonResourceExtensions = []string{".json", ".yaml", ".txt", ".csv", ".md"}
 
 //Dao represents neatly data access object
 type Dao struct {
+	includeMeta        bool
 	localResourceRepo  string
 	remoteResourceRepo string
 	factory            toolbox.DecoderFactory
@@ -51,7 +52,9 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	if err != nil {
 		return err
 	}
-	targetMap["Source"] = sourceMap
+	if d.includeMeta {
+		targetMap["Source"] = sourceMap
+	}
 	return d.converter.AssignConverted(target, targetMap)
 }
 
@@ -168,7 +171,7 @@ func (d *Dao) load(loadingContext data.Map, source *url.Resource, scanner *bufio
 		if !record.IsEmpty() {
 			context.virtualObjects = data.NewMap()
 			context.fieldIndex = make(map[string]int)
-			tag.setTagObject(context, record.Record)
+			tag.setTagObject(context, record.Record, d.includeMeta)
 
 			if strings.Contains(line, "$") {
 				for k, v := range record.Record {
@@ -606,7 +609,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -624,6 +627,7 @@ func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string
 
 func (d *Dao) expandMeta(context *tagContext, text string) string {
 	var replacementMap = data.NewMap()
+
 	replacementMap.Put("tagId", context.tag.TagID())
 	replacementMap.Put("tag", context.tag.Name)
 	if context.tag.Subpath != "" {
@@ -688,11 +692,12 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 
 //NewDao creates a new neatly format compatible format data access object.
 //It takes localResourceRepo, remoteResourceRepo, dataFormat and optionally delimiterDecoderFactory
-func NewDao(localResourceRepo, remoteResourceRepo, dataFormat string, delimiterDecoderFactory toolbox.DecoderFactory) *Dao {
+func NewDao(includeMeta bool, localResourceRepo, remoteResourceRepo, dataFormat string, delimiterDecoderFactory toolbox.DecoderFactory) *Dao {
 	if delimiterDecoderFactory == nil {
 		delimiterDecoderFactory = toolbox.NewDelimiterDecoderFactory()
 	}
 	return &Dao{
+		includeMeta:        includeMeta,
 		localResourceRepo:  localResourceRepo,
 		remoteResourceRepo: remoteResourceRepo,
 		factory:            delimiterDecoderFactory,

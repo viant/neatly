@@ -19,6 +19,7 @@ func init() {
 	flag.String("i", "", "<neatly document path> ")
 	flag.String("f", "json", "<output format> json or yaml")
 	flag.Bool("v", false, "neatly version")
+	flag.Bool("m", false, "include neatly meta data")
 
 }
 
@@ -58,7 +59,7 @@ func main() {
 	}
 	var context = data.NewMap()
 	var neatlyDocument = make(map[string]interface{})
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(toolbox.AsBoolean(flag.Lookup("m").Value.String()), "", "", "", nil)
 	err := dao.Load(context, url.NewResource(input), &neatlyDocument)
 	if err != nil {
 		log.Fatal("failed to loead neatly document: %v %v\n", input, err)

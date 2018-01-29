@@ -31,7 +31,7 @@ func (t *Tag) HasActiveIterator() bool {
 	return t.Iterator != nil && t.Iterator.Has()
 }
 
-func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}) data.Map {
+func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}, includeMeta bool) data.Map {
 	var result data.Map
 	if t.IsArray {
 		result = data.NewMap()
@@ -39,7 +39,9 @@ func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}) d
 	} else {
 		result = context.objectContainer.GetMap(t.Name)
 	}
-	t.setMeta(result, record)
+	if includeMeta {
+		t.setMeta(result, record)
+	}
 	context.tagObject = result
 	return result
 }
