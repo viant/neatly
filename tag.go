@@ -39,6 +39,31 @@ func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}, i
 	} else {
 		result = context.objectContainer.GetMap(t.Name)
 	}
+
+	context.tagName = t.Name
+	if t.HasActiveIterator() {
+		context.tagIndex = t.Iterator.Index()
+	}
+	value, has := record["Subpath"]
+	if has {
+		t.Subpath = t.expandPathIfNeeded(toolbox.AsString(value))
+	}
+	if t.Subpath != "" {
+		context.Subpath = t.Subpath
+	}
+	context.tagID = t.TagID()
+
+	/*
+
+	tagName  string
+	tagIndex string
+	Subpath string
+	tagID string
+
+
+
+	 */
+
 	if includeMeta {
 		t.setMeta(result, record)
 	}

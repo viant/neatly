@@ -713,6 +713,14 @@ type tagContext struct {
 	fieldIndex      map[string]int
 	rootObject      data.Map
 	tag             *Tag
+
+	tagName  string
+	tagIndex string
+	Subpath string
+	tagID string
+
+
+
 	tagObject       data.Map
 	virtualObjects  data.Map
 }

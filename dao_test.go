@@ -29,7 +29,7 @@ type UseCase1 struct {
 }
 
 func TestDao_LoadUseCase1(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 
 	var useCase1 = &UseCase1{}
@@ -89,7 +89,7 @@ type UseCase2 struct {
 }
 
 func TestDao_LoadUseCase2(t *testing.T) {
-	dao := neatly.NewDao("", "", "yyyy-MM-dd h:mm:ss", nil)
+	dao := neatly.NewDao(false, "", "", "yyyy-MM-dd h:mm:ss", nil)
 	var context = data.NewMap()
 	var useCase2 = &UseCase2{}
 	err := dao.Load(context, url.NewResource("test/use_case2.csv"), useCase2)
@@ -161,7 +161,7 @@ type UseCase3 struct {
 }
 
 func TestDao_LoadUseCase3(t *testing.T) {
-	dao := neatly.NewDao("", "", "yyyy-MM-dd h:mm:ss", nil)
+	dao := neatly.NewDao(false, "", "", "yyyy-MM-dd h:mm:ss", nil)
 	var context = data.NewMap()
 	var useCase3 = &UseCase3{}
 	err := dao.Load(context, url.NewResource("test/use_case3.csv"), useCase3)
@@ -186,7 +186,7 @@ func TestDao_LoadUseCase3(t *testing.T) {
 }
 
 func TestDao_LoadUseCase4(t *testing.T) {
-	dao := neatly.NewDao("", "", "yyyy-MM-dd h:mm:ss", nil)
+	dao := neatly.NewDao(false, "", "", "yyyy-MM-dd h:mm:ss", nil)
 	var context = data.NewMap()
 	var useCase3 = &UseCase3{}
 	err := dao.Load(context, url.NewResource("test/use_case4.csv"), useCase3)
@@ -219,7 +219,7 @@ type UseCase5 struct {
 }
 
 func TestDao_LoadUseCase5(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase5 = &UseCase5{}
 	err := dao.Load(context, url.NewResource("test/use_case5.csv"), useCase5)
@@ -248,7 +248,7 @@ type UseCase6 struct {
 }
 
 func TestDao_LoadUseCase6(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase6 = &UseCase6{}
 	err := dao.Load(context, url.NewResource("test/use_case6.csv"), useCase6)
@@ -290,11 +290,13 @@ type UseCase7 struct {
 }
 
 func TestDao_LoadUseCase7(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case7.csv"), useCase7)
-	assert.Nil(t, err)
+	if ! assert.Nil(t, err) {
+		return
+	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
 
 	for i := 0; i < 2; i++ {
@@ -330,11 +332,13 @@ func TestDao_LoadUseCase7(t *testing.T) {
 }
 
 func TestDao_LoadUseCase8(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case8.csv"), useCase7)
-	assert.Nil(t, err)
+	if ! assert.Nil(t, err) {
+		return
+	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
 
 	for i := 0; i < 2; i++ {
@@ -370,11 +374,13 @@ func TestDao_LoadUseCase8(t *testing.T) {
 }
 
 func TestDao_LoadUseCase9(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case9.csv"), useCase7)
-	assert.Nil(t, err)
+	if ! assert.Nil(t, err) {
+		return
+	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
 
 	for i := 0; i < 2; i++ {
@@ -410,11 +416,13 @@ func TestDao_LoadUseCase9(t *testing.T) {
 }
 
 func TestDao_LoadUseCase10(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case10.csv"), useCase7)
-	assert.Nil(t, err)
+	if ! assert.Nil(t, err) {
+		return
+	}
 	assert.Equal(t, 2, len(useCase7.UseCases))
 
 	for i := 0; i < 2; i++ {
@@ -450,14 +458,15 @@ func TestDao_LoadUseCase10(t *testing.T) {
 }
 
 func TestDao_LoadUseCase11(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(true, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case11.csv"), useCase7)
 
 	assert.Nil(t, err)
-	assert.Equal(t, 2, len(useCase7.UseCases))
-
+	if ! assert.Nil(t, err) {
+		return
+	}
 	for i := 0; i < 2; i++ {
 		assert.Equal(t, i+1, useCase7.UseCases[i].Id)
 		assert.Equal(t, fmt.Sprintf("use case %d", i+1), useCase7.UseCases[i].Description)
@@ -491,7 +500,7 @@ func TestDao_LoadUseCase11(t *testing.T) {
 }
 
 func TestDao_LoadUseCase12(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var useCase7 = &UseCase7{}
 	err := dao.Load(context, url.NewResource("test/use_case12.csv"), useCase7)
@@ -522,7 +531,7 @@ type UseCase13 struct {
 }
 
 func TestDao_LoadUseCase13(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 
 	var useCase = &UseCase13{}
@@ -557,7 +566,7 @@ type UseCase14 struct {
 
 func TestDao_LoadUseCase14(t *testing.T) {
 
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 
 	var useCase = &UseCase14{}
@@ -588,7 +597,7 @@ func TestDao_LoadUseCase14(t *testing.T) {
 }
 
 func TestMissingReference(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var document = make(map[string]interface{})
 	err := dao.Load(context, url.NewResource("test/broken1.csv"), &document)
@@ -596,7 +605,7 @@ func TestMissingReference(t *testing.T) {
 }
 
 func TestBrokenJsonReference(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var document = make(map[string]interface{})
 	err := dao.Load(context, url.NewResource("test/broken2.csv"), &document)
@@ -604,7 +613,7 @@ func TestBrokenJsonReference(t *testing.T) {
 }
 
 func TestBrokenExternalReference(t *testing.T) {
-	dao := neatly.NewDao("", "", "", nil)
+	dao := neatly.NewDao(false, "", "", "", nil)
 	var context = data.NewMap()
 	var document = make(map[string]interface{})
 	err := dao.Load(context, url.NewResource("test/broken3.csv"), &document)
