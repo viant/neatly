@@ -400,12 +400,17 @@ func readLines(scanner *bufio.Scanner) []string {
 	return lines
 }
 
+func isExternalResource(candidate string) bool {
+	return strings.HasPrefix(candidate, "@") || strings.HasPrefix(candidate, "#") &&
+		!(strings.HasPrefix(candidate, "@@") || strings.HasPrefix(candidate, "#%"))
+}
+
 /*
 getExternalResource returns resource for provided asset URI. This function tries to load asset using the following methods:
 
 1) For valid URL :  new resource if returned with owner resource credential
 2) For asset starting  with / new file resource if returned with owner resource credential
-3) For asset starting with # has is being stripped out and asset is being loaded relative path asset
+3) For asset starting with @ (or #)  has is being stripped out and asset is being loaded relative path asset
 4) For asset with relative path the following lookup are being Used, the first successful creates new resource with owner resource credential
 	a) owner resource path with subpath if provided and  asset name
 	b) owner resource path  without subpath and asset name
@@ -416,11 +421,11 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 	if URI == "" {
 		return nil, fmt.Errorf("resource  was empty")
 	}
+
+	URI = strings.TrimSpace(URI)
+	URI = string(URI[1:])
 	if strings.Contains(URI, "://") || strings.HasPrefix(URI, "/") {
 		return url.NewResource(URI, context.source.Credential), nil
-	}
-	if strings.HasPrefix(URI, "#") {
-		URI = string(URI[1:])
 	}
 
 	ownerURL, URL := buildURLWithOwnerURL(context.source, context.tag.Subpath, URI)
@@ -554,7 +559,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		} else {
 			assetContent = toolbox.AsString(value)
 		}
-	} else if strings.HasPrefix(asset, "#") {
+	} else if isExternalResource(asset) {
 		uriExtension = path.Ext(asset)
 		resource, err := d.getExternalResource(context, asset)
 		if err != nil {
@@ -565,6 +570,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 			return nil, err
 		}
 	}
+
 
 	assetContent = d.expandMeta(context, assetContent)
 	assetContent = strings.Trim(assetContent, " \t\n\r")
@@ -641,21 +647,26 @@ func (d *Dao) expandMeta(context *tagContext, text string) string {
 	return replacementMap.ExpandAsText(text)
 }
 
+
+
+
+
 func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, error) {
 	virtualObjects := context.virtualObjects
 	var assets []string
+	value, unescaped:= unescapeSpecialCharacters(value)
+	if unescaped {
+		return value, nil
+	}
+
 
 	if strings.HasPrefix(value, "$") {
 		return virtualObjects.Expand(value), nil
-	} else if strings.HasPrefix(value, "##") {
-		//escape #
-		value = string(value[1:])
-	} else if strings.HasPrefix(value, "#") {
+	} else if isExternalResource(value) {
 		if len(virtualObjects) > 0 {
 			value = virtualObjects.ExpandAsText(value)
 		}
-
-		assets = strings.Split(value, "|")
+		assets = getAssetURIs(value)
 		mainAsset, err := d.loadExternalResource(context, assets[0])
 		if err != nil {
 			return nil, err
@@ -666,7 +677,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 	}
 
 	if len(assets) == 0 && strings.Contains(value, "|") && strings.HasPrefix(value, "[") {
-		assets = strings.Split(value, "|")
+		assets = getAssetURIs(value)
 	}
 
 	if len(assets) > 1 {
@@ -716,13 +727,11 @@ type tagContext struct {
 
 	tagName  string
 	tagIndex string
-	Subpath string
-	tagID string
+	Subpath  string
+	tagID    string
 
-
-
-	tagObject       data.Map
-	virtualObjects  data.Map
+	tagObject      data.Map
+	virtualObjects data.Map
 }
 
 func newTagContext(context data.Map, source *url.Resource, tag *Tag, objectContainer data.Map, referenceValues referenceValues, rootObject data.Map, tagObject data.Map) *tagContext {

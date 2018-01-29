@@ -517,7 +517,7 @@ Note that external lookup first check if resource exists in subpath if not it wi
 same directory as a master file (source of the tabular data).
 
 
-### External resources loading with piping substitution and user defined function (udf) use case.
+### External resources loading with content substitution and user defined function (udf) use case.
 
 
    Take as example the following data structure:
@@ -607,8 +607,9 @@ Since customer represents valid JSON, dailyCap and overallCap are being substitu
 Note that there are being expaned in double qoutes thus they became of text type.
 In order to convert then to int data type, AsInt user defined function is being used.
 
-Pipe is used to provide substitution source, it can be a JSON object, or another external resource to JSON or YAML file.
-Multi piping substitution is supported.
+Space (or pipe) can used to provide additional external substitution source, it can be a JSON object, or another external resource to JSON or YAML file.
+Pipe can be used to separate inline sources.
+Multi source substitution is supported.
 
 
 Neatly tabular alternative representation.
