@@ -259,7 +259,7 @@ func Cat(source interface{}, state data.Map) (interface{}, error) {
 		}
 		return nil, fmt.Errorf("no such file or directory %v", filename)
 	}
-	file, err := os.Open(filename)
+	file, err := toolbox.OpenFile(filename)
 	if err != nil {
 		return nil, err
 	}

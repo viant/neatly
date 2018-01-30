@@ -149,7 +149,7 @@ func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber 
 		LineNumber:  lineNumber,
 	}
 	key = decodeIteratorIfPresent(key, result)
-	if string(key[0:2]) == "[]" {
+	if len(key) > 2 && string(key[0:2]) == "[]" {
 		result.Name = string(key[2:])
 		result.IsArray = true
 	}
