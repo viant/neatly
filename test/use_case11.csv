@@ -1,5 +1,5 @@
 Root,UseCases,,,,,
 ,%UseCases,,,,,
 []UseCases,Subpath,Id,Description ,/Setup.MyDb.[]Customer,:data.DAILY_CAP,:data.OVERALL_CAP
-,usecase11/001*,1,#use_case.txt,#customer.json|$data,200,3000
-,usecase11/002*,2,#use_case.txt,#customer.json|$data,100,1000
+,usecase11/001*,1,@use_case.txt,@customer.json|$data,200,3000
+,usecase11/002*,2,@use_case.txt,@customer.json|$data,100,1000
