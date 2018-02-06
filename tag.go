@@ -16,6 +16,7 @@ type Tag struct {
 	OwnerSource   *url.Resource
 	OwnerName     string
 	Name          string
+	Group         string
 	IsArray       bool
 	Iterator      *TagIterator
 	LineNumber    int
@@ -122,6 +123,11 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 		object["Subpath"] = t.Subpath
 	}
 	object["TagID"] = t.TagID()
+
+	if value, has := record["Group"];has {
+		t.Group = toolbox.AsString(value)
+	}
+
 }
 
 //TagID returns tag ID
@@ -130,7 +136,7 @@ func (t *Tag) TagID() string {
 	if t.HasActiveIterator() {
 		index = t.Iterator.Index()
 	}
-	value := fmt.Sprintf(t.TagIDTemplate, index, t.Subpath)
+	value := fmt.Sprintf(t.TagIDTemplate, t.Group, index, t.Subpath)
 	var result = make([]byte, 0)
 	for _, r := range value {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
@@ -153,6 +159,6 @@ func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber 
 		result.Name = string(key[2:])
 		result.IsArray = true
 	}
-	result.TagIDTemplate = ownerName + result.Name + "%v%v"
+	result.TagIDTemplate = ownerName + result.Name + "%v%v%v"
 	return result
 }
