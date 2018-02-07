@@ -87,11 +87,14 @@ func GetOwnerDirectory(state data.Map) (string, error) {
 
 //HasResource check if patg/url to external resource exists
 func HasResource(source interface{}, state data.Map) (interface{}, error) {
-	var parentDirectory = ""
-	if state.Has(OwnerURL) {
-		parentDirectory, _ = GetOwnerDirectory(state)
+	filename := toolbox.AsString(source)
+	if ! strings.HasPrefix(filename,"/") {
+		var parentDirectory = ""
+		if state.Has(OwnerURL) {
+			parentDirectory, _ = GetOwnerDirectory(state)
+		}
+		filename = path.Join(parentDirectory, toolbox.AsString(source))
 	}
-	filename := path.Join(parentDirectory, toolbox.AsString(source))
 	var result = toolbox.FileExists(filename)
 	return result, nil
 }
