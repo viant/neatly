@@ -51,7 +51,7 @@ Field name should start with an uppercase letter to map to the underlying data s
 It can be prefixed with 
    1) **square bracket '[]'** to denote that field is an array, all rows below will be elements for the array, unless there is empty line
    2) **slash '/'** to denote that field belongs to root object rather then preceding tag object
-   3) **colon ':'**  or expression stating with **lowercase** character denotes a virtual object field that can be used as data substitution with dollar($) sign expression.
+   3) **colon ':'**  or expression stating with **lowercase** character denotes a virtual object field that can be used as data substitution source referenced with dollar($) sign expression.
    
    
 On top of that field definition can use dot (.) to define nested object of object or array type. 
