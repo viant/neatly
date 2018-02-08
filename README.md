@@ -907,8 +907,32 @@ To prevent line loading into document , **//** can be used at the beginning of t
 
 
 <a name="Usage"></a>
+
+
+
 ## Usage 
 
+[Download](https://github.com/viant/neatly/releases) or build latest neatly.
+
+
+```text
+ $ neatly -h
+Usage of neatly:
+  -f string
+    	<output format> json or yaml (default "json")
+  -i string
+    	<neatly document path> 
+  -v	neatly version
+  -f string
+    	<output format> json or yaml (default "json")
+  -i string
+    	<neatly document path> 
+  -v	neatly version
+
+```
+
+
+To convert neatly document into go data structure.
 
 ```go
 
