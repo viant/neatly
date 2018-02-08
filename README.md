@@ -389,18 +389,18 @@ Neatly tabular representation.
 | --- | ---| --- | --- |
 | | %Students | |  |
 |**[]Students**| **Id** | **Name** | **Scores** |
-| | 1 | Smith | \#scores1.json | 
-| | 2 | Kowalczyk | \#scores2.json | 
+| | 1 | Smith | \@scores1.json | 
+| | 2 | Kowalczyk | \@scores2.json | 
  
 
 In this case scores are loaded from local json file.
 
-External resource starts with **pound (\#)** sing and can be relative, absolute path or a valid URL to any content. 
+External resource starts with **pound (\@)** sing and can be relative, absolute path or a valid URL to any content. 
 In case of json or yaml files, the content  is treated as data structure.
 **To escape '#' use '##'.**
 
 Where 
-\#scores1.json
+\@scores1.json
 
 ```json
   [
@@ -416,7 +416,7 @@ Where
 
 ```
 
-\#scores2.json
+\@scores2.json
 
 ```json
   [
@@ -475,18 +475,18 @@ Neatly tabular representation.
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
 | **[]UseCases{1..002}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
-| | usecase7/${index} / | $index | \#use_case.txt |  \#customer.json |
+| | usecase7/${index} / | $index | \@use_case.txt |  \@customer.json |
 
 
 Where
 
-\#usecase7/001/use_case.txt
+\@usecase7/001/use_case.txt
 
 ```text
 use case 1
 ```
 
-\#usecase7/001/customer.json
+\@usecase7/001/customer.json
 ```json
 {
   "ID": 1,
@@ -497,13 +497,13 @@ use case 1
 ```
 
 
-\#usecase7/002/use_case.txt
+\@usecase7/002/use_case.txt
 
 ```text
 use case 2
 ```
 
-\#usecase7/002/customer.json
+\@usecase7/002/customer.json
 ```json
 {
   "ID": 2,
@@ -564,18 +564,18 @@ Neatly tabular representation.
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
 | **[]UseCases{1..002}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
-| | usecase8/${index} / | $index | \#use_case.txt|  \#customer.json\| {"dailyCap":100, "overallCap":1000} |
+| | usecase8/${index} / | $index | \@use_case.txt|  \@customer.json\| {"dailyCap":100, "overallCap":1000} |
 
 
 Where
 
-\#usecase8/001/use_case.txt
+\@usecase8/001/use_case.txt
 
 ```text
 use case 1
 ```
 
-\#usecase8/001/customer.json
+\@usecase8/001/customer.json
 ```json
 {
    "ID": 1,
@@ -587,13 +587,13 @@ use case 1
 ```
 
 
-\#usecase8/002/use_case.txt
+\@usecase8/002/use_case.txt
 
 ```text
 use case 2
 ```
 
-\#usecase8/002/customer.json
+\@usecase8/002/customer.json
 ```json
 {
   "ID": 2,
@@ -603,7 +603,7 @@ use case 2
 }
 ```
 
-In this case content of the #customer.json were substituted with dailyCap and overallCap values.
+In this case content of the @customer.json were substituted with dailyCap and overallCap values.
 Since customer represents valid JSON, dailyCap and overallCap are being substitute.
 Note that there are being expaned in double qoutes thus they became of text type.
 In order to convert then to int data type, AsInt user defined function is being used.
@@ -620,13 +620,13 @@ Neatly tabular alternative representation.
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
 | **[]UseCases{1..2}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
-| | usecase9/${index} / | $index | \#use_case.txt |  \#customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
+| | usecase9/${index} / | $index | \@use_case.txt |  \@customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
 
 
 Where
 
 
-\#usecase9/001/customer.json
+\@usecase9/001/customer.json
 ```json
 {
    "ID": 1,
@@ -637,7 +637,7 @@ Where
 
 
 
-\#usecase9/002/customer.json
+\@usecase9/002/customer.json
 ```json
 {
   "ID": 2,
@@ -668,7 +668,7 @@ Neatly tabular alternative representation.
 | --- | --- | --- | --- | --- |
 |  |%UseCases | | | |
 | **[]UseCases{1..2}**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** |
-| | usecase10/${index}* / | $index | \#use_case.txt |  \#customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
+| | usecase10/${index}* / | $index | \@use_case.txt |  \@customer.json\| {"DAILY_CAP":100, "OVERALL_CAP":1000} |
 
 
 
@@ -676,7 +676,7 @@ Neatly tabular alternative representation.
 Where
 
 
-\#usecase10/001_description1/customer.json
+\@usecase10/001_description1/customer.json
 ```json
 {
    "ID": 1,
@@ -687,7 +687,7 @@ Where
 
 
 
-\#usecase10/002_description2/customer.json
+\@usecase10/002_description2/customer.json
 ```json
 {
   "ID": 2,
@@ -775,8 +775,8 @@ Neatly tabular representation.
 | --- | --- | --- | --- | --- | ---| --- |
 |  |%UseCases | | | | | |
 | **[]UseCases**  | **Subpath** | **Id** | **Description** | **/Setup.MyDb.[]Customer** | **:data.DAILY_CAP** | **:data.OVERALL_CAP** |
-| | usecase10/001 / | 1 | \#useCase.json |  \#customer.json\| $data | 200 | 3000 |
-| | usecase10/002 / | 2 | \#useCase.json |  \#customer.json\| $data | 100 | 1000 |
+| | usecase10/001 / | 1 | \@useCase.json |  \@customer.json\| $data | 200 | 3000 |
+| | usecase10/002 / | 2 | \@useCase.json |  \@customer.json\| $data | 100 | 1000 |
 
 
 
