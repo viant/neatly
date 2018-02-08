@@ -395,9 +395,9 @@ Neatly tabular representation.
 
 In this case scores are loaded from local json file.
 
-External resource starts with **pound (\@)** sing and can be relative, absolute path or a valid URL to any content. 
-In case of json or yaml files, the content  is treated as data structure.
-**To escape '#' use '##'.**
+External resource starts with  **(\@)**  or \# sing, resource URL can be relative, absolute path or a valid URL to any content. 
+In case of json or yaml files, the content is treated as data structure.
+**To escape '@' use '@@', or '#' use '##' .**
 
 Where 
 \@scores1.json
