@@ -1,6 +1,6 @@
 {
   "ID": 2,
   "NAME": "Kowalczyk",
-  "DAILY_CAP": "!AsFloat($dailyCap)",
-  "OVERALL_CAP": "!AsFloat($overallCap)"
+  "DAILY_CAP": "$AsFloat($dailyCap)",
+  "OVERALL_CAP": "$AsFloat($overallCap)"
 }

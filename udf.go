@@ -41,6 +41,28 @@ func AsInt(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.AsInt(source), nil
 }
 
+//Add increment supplied state key with delta ['key', -2]
+func Increment(args interface{}, state data.Map) (interface{}, error) {
+	if toolbox.IsSlice(args) {
+		return nil, fmt.Errorf("args were not slice: %T", args)
+	}
+	aSlice := toolbox.AsSlice(args)
+	if len(aSlice) != 2 {
+		return nil, fmt.Errorf("expeted 2 arguments but had: %v", len(aSlice))
+
+	}
+	var delta = toolbox.AsInt(aSlice[1])
+	var exrp = toolbox.AsString(aSlice[0])
+	value, has := state.GetValue(exrp)
+	if ! has {
+		state.SetValue(exrp, delta)
+	} else {
+		state.SetValue(exrp, delta+toolbox.AsInt(value))
+	}
+	value, _ = state.GetValue(exrp)
+	return value, nil
+}
+
 //AsFloat converts source into float64
 func AsFloat(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.AsFloat(source), nil
@@ -88,7 +110,7 @@ func GetOwnerDirectory(state data.Map) (string, error) {
 //HasResource check if patg/url to external resource exists
 func HasResource(source interface{}, state data.Map) (interface{}, error) {
 	filename := toolbox.AsString(source)
-	if ! strings.HasPrefix(filename,"/") {
+	if ! strings.HasPrefix(filename, "/") {
 		var parentDirectory = ""
 		if state.Has(OwnerURL) {
 			parentDirectory, _ = GetOwnerDirectory(state)

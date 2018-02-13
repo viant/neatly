@@ -614,7 +614,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -654,7 +654,7 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		return value, nil
 	}
 
-	if strings.HasPrefix(value, "$") {
+	if strings.HasPrefix(value, "$") && !strings.Contains(value, "(") {
 		return virtualObjects.Expand(value), nil
 	} else if isExternalResource(value) {
 		if len(virtualObjects) > 0 {

@@ -580,8 +580,8 @@ use case 1
 {
    "ID": 1,
    "NAME": "Smith",
-   "DAILY_CAP": "!AsInt($dailyCap)",
-   "OVERALL_CAP": "!AsInt($overallCap)"
+   "DAILY_CAP": "$AsInt($dailyCap)",
+   "OVERALL_CAP": "$AsInt($overallCap)"
  
 }
 ```
@@ -598,8 +598,8 @@ use case 2
 {
   "ID": 2,
   "NAME": "Kowalczyk",
-   "DAILY_CAP": "!AsInt($dailyCap)",
-   "OVERALL_CAP": "!AsInt($overallCap)"
+   "DAILY_CAP": "$AsInt($dailyCap)",
+   "OVERALL_CAP": "$AsInt($overallCap)"
 }
 ```
 
@@ -701,16 +701,16 @@ Where
 ### User defined functions (udf)
 
 The user defined system allowed to dynamically convert value from one form to another.
-To invoke udf value of data structure has to start with **exclamation mark(!)** followed by udf name register in the context
+To invoke udf value of data structure has to start with **$FUNC_NAME(ARGS)** 
+for instance $AsFloat("123"), $AsFloat($key1)
 
-for instance !AsFloat("123"), !AsFloat($key1)
-
-In order to define udf please use the follwoing function signature:
+In order to define udf please use the following function signature:
 
 ```go
     type Udf func(interface{}, Map) (interface{}, error)
 
 ```
+
 Builtin udf'
 
 1) AsMap
@@ -728,6 +728,7 @@ Builtin udf'
 12) UnzipText takes []byte to uncompress it into string.
 13) Markdown generate HTML for suppied markdown
 14) Cat returns content of supplied filename
+15) Increment increments state key value with supplied delta  i.e. $Increment(['counterKey', -2]), returns total
 
 ### External resources loading with virtual object value substitution use case.
 

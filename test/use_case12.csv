@@ -1,5 +1,5 @@
 Root,UseCases,,,,,
 ,%UseCases,,,,,
 []UseCases,This
-,!LoadNeatly(use_case12_1.csv)
-,!LoadNeatly(use_case12_2.csv)
+,$LoadNeatly(use_case12_1.csv)
+,$LoadNeatly(use_case12_2.csv)
