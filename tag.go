@@ -122,11 +122,10 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	if t.Subpath != "" {
 		object["Subpath"] = t.Subpath
 	}
-	object["TagID"] = t.TagID()
-
 	if value, has := record["Group"];has {
 		t.Group = toolbox.AsString(value)
 	}
+	object["TagID"] = t.TagID()
 
 }
 
