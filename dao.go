@@ -614,7 +614,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 

@@ -13,15 +13,15 @@ import (
 
 //Tag represents a nearly tag
 type Tag struct {
-	OwnerSource   *url.Resource
-	OwnerName     string
-	Name          string
-	Group         string
-	IsArray       bool
-	Iterator      *TagIterator
-	LineNumber    int
-	Subpath       string
-	TagIDTemplate string
+	OwnerSource *url.Resource
+	OwnerName   string
+	Name        string
+	Group       string
+	IsArray     bool
+	Iterator    *TagIterator
+	LineNumber  int
+	Subpath     string
+	tagIdPrefix string
 }
 
 //HasActiveIterator returns true if tag has active iterator
@@ -122,7 +122,7 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	if t.Subpath != "" {
 		object["Subpath"] = t.Subpath
 	}
-	if value, has := record["Group"];has {
+	if value, has := record["Group"]; has {
 		t.Group = toolbox.AsString(value)
 	}
 	object["TagID"] = t.TagID()
@@ -135,10 +135,21 @@ func (t *Tag) TagID() string {
 	if t.HasActiveIterator() {
 		index = t.Iterator.Index()
 	}
-	value := fmt.Sprintf(t.TagIDTemplate, t.Group, index, t.Subpath)
+	var subPath = t.Subpath
+	if subPath != "" {
+		if strings.Contains(subPath, index) {
+			index = ""
+		}
+	}
+	var tagIdPostfix = t.Group + index + subPath
+	if tagIdPostfix != "" {
+		tagIdPostfix = "_" + tagIdPostfix
+	}
+	value := t.tagIdPrefix + tagIdPostfix
+
 	var result = make([]byte, 0)
 	for _, r := range value {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
 			result = append(result, byte(r))
 		}
 	}
@@ -158,6 +169,6 @@ func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber 
 		result.Name = string(key[2:])
 		result.IsArray = true
 	}
-	result.TagIDTemplate = ownerName + result.Name + "%v%v%v"
+	result.tagIdPrefix = ownerName + "_" + result.Name
 	return result
 }

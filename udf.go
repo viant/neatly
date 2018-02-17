@@ -54,7 +54,7 @@ func Increment(args interface{}, state data.Map) (interface{}, error) {
 	var delta = toolbox.AsInt(aSlice[1])
 	var exrp = toolbox.AsString(aSlice[0])
 	value, has := state.GetValue(exrp)
-	if ! has {
+	if !has {
 		state.SetValue(exrp, delta)
 	} else {
 		state.SetValue(exrp, delta+toolbox.AsInt(value))
@@ -110,7 +110,7 @@ func GetOwnerDirectory(state data.Map) (string, error) {
 //HasResource check if patg/url to external resource exists
 func HasResource(source interface{}, state data.Map) (interface{}, error) {
 	filename := toolbox.AsString(source)
-	if ! strings.HasPrefix(filename, "/") {
+	if !strings.HasPrefix(filename, "/") {
 		var parentDirectory = ""
 		if state.Has(OwnerURL) {
 			parentDirectory, _ = GetOwnerDirectory(state)
