@@ -1,7 +1,6 @@
 package neatly
 
 import (
-	"fmt"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/storage"
