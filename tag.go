@@ -141,7 +141,7 @@ func (t *Tag) TagID() string {
 		}
 	}
 	var tagIdPostfix = t.Group + index + subPath
-	if tagIdPostfix != "" {
+	if tagIdPostfix != "" && t.tagIdPrefix != ""{
 		tagIdPostfix = "_" + tagIdPostfix
 	}
 	value := t.tagIdPrefix + tagIdPostfix
@@ -168,6 +168,10 @@ func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber 
 		result.Name = string(key[2:])
 		result.IsArray = true
 	}
-	result.tagIdPrefix = ownerName + "_" + result.Name
+
+	if ownerName != "" {
+		ownerName = ownerName + "_"
+	}
+	result.tagIdPrefix = ownerName + result.Name
 	return result
 }
