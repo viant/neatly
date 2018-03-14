@@ -9,6 +9,7 @@ import (
 	"github.com/viant/toolbox/url"
 	"path"
 	"strings"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -427,9 +428,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 	if strings.Contains(URI, "://") || strings.HasPrefix(URI, "/") {
 		return url.NewResource(URI, context.source.Credential), nil
 	}
-
 	ownerURL, URL := buildURLWithOwnerURL(context.source, context.tag.Subpath, URI)
-
 	service, err := storage.NewServiceForURL(URL, context.source.Credential)
 	if err != nil {
 		return nil, err
@@ -438,6 +437,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 
 	if !exists {
 		if d.remoteResourceRepo != "" {
+
 			fallbackResource, err := d.NewRepoResource(context.context, URI)
 			if err == nil {
 				service, _ = storage.NewServiceForURL(fallbackResource.URL, context.source.Credential)
@@ -501,7 +501,6 @@ If Local resource does not exist but remote does it copy it over to Local to avo
 func (d *Dao) NewRepoResource(context data.Map, URI string) (*url.Resource, error) {
 	var localResourceURL = fmt.Sprintf(d.localResourceRepo, URI)
 	var localResource = url.NewResource(localResourceURL)
-
 	var localService, err = storage.NewServiceForURL(localResourceURL, "")
 	if err != nil {
 		return nil, err
@@ -573,11 +572,14 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 
 	assetContent = d.expandMeta(context, assetContent)
 	assetContent = strings.Trim(assetContent, " \t\n\r")
-
 	if uriExtension == ".yaml" || uriExtension == ".yml" {
-		err := toolbox.NewYamlDecoderFactory().Create(strings.NewReader(assetContent)).Decode(&aMap)
+		mapSlice := yaml.MapSlice{}
+		err := toolbox.NewYamlDecoderFactory().Create(strings.NewReader(assetContent)).Decode(&mapSlice)
 		if err != nil {
 			return nil, err
+		}
+		for _, v := range mapSlice {
+			aMap[toolbox.AsString(v.Key)] = v
 		}
 	} else if strings.HasPrefix(assetContent, "{") {
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(assetContent)).Decode(&aMap)
