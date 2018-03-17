@@ -31,9 +31,8 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 			return nil, err
 		}
 		return aMap, nil
-
 	}
-	return source, nil
+	return toolbox.ToMap(source)
 }
 
 //AsInt converts source into int

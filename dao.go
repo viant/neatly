@@ -63,6 +63,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("AsMap", AsMap)
 	context.Put("WorkingDirectory", WorkingDirectory)
+	context.Put("Pwd", WorkingDirectory)
 	context.Put("AsInt", AsInt)
 	context.Put("AsFloat", AsFloat)
 	context.Put("AsBool", AsBool)
@@ -434,18 +435,14 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 		return nil, err
 	}
 	exists, _ := service.Exists(URL)
-
 	if !exists {
 		if d.remoteResourceRepo != "" {
-
 			fallbackResource, err := d.NewRepoResource(context.context, URI)
 			if err == nil {
 				service, _ = storage.NewServiceForURL(fallbackResource.URL, context.source.Credential)
 				if exists, _ = service.Exists(fallbackResource.URL); exists {
 					URL = fallbackResource.URL
-
 				}
-
 			}
 		}
 		if !exists && context.tag.Subpath != "" {
@@ -564,7 +561,8 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		if err != nil {
 			return nil, err
 		}
-		assetContent, err = resource.DownloadText()
+
+		assetContent, err = d.loadExternalResource(context, resource.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -581,6 +579,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		for _, v := range mapSlice {
 			aMap[toolbox.AsString(v.Key)] = v
 		}
+
 	} else if strings.HasPrefix(assetContent, "{") {
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(assetContent)).Decode(&aMap)
 		if err != nil {
@@ -591,6 +590,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 			return nil, fmt.Errorf("failed to decode json:%v, %v", string(assetContent[:assetContentLength]), err)
 		}
 	}
+
 	if escapeQuotes {
 		for k, v := range aMap {
 			if v == nil {
@@ -616,13 +616,22 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
 func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string, error) {
 	resource, err := d.getExternalResource(context, strings.TrimSpace(assetURI))
 	var result string
+	var ext = path.Ext(resource.URL)
+	if ext == ".yaml" || ext == ".yml"{
+		var aMap = make(map[string]interface{})
+		err = resource.Decode(&aMap)
+		if err != nil {
+			return "", err
+		}
+		return toolbox.AsJSONText(aMap)
+	}
 	if err == nil {
 		result, err = resource.DownloadText()
 	}
@@ -708,7 +717,7 @@ func NewDao(includeMeta bool, localResourceRepo, remoteResourceRepo, dataFormat 
 		localResourceRepo:  localResourceRepo,
 		remoteResourceRepo: remoteResourceRepo,
 		factory:            delimiterDecoderFactory,
-		converter:          toolbox.NewColumnConverter(toolbox.DateFormatToLayout(dataFormat)),
+		converter:          toolbox.NewConverter(toolbox.DateFormatToLayout(dataFormat), ""),
 	}
 }
 
