@@ -425,7 +425,11 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 	}
 
 	URI = strings.TrimSpace(URI)
-	URI = string(URI[1:])
+
+	if strings.HasPrefix(URI, "@") || strings.HasPrefix(URI, "#") {
+		URI = string(URI[1:])
+	}
+
 	if strings.Contains(URI, "://") || strings.HasPrefix(URI, "/") {
 		return url.NewResource(URI, context.source.Credential), nil
 	}
@@ -557,7 +561,9 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	} else if isExternalResource(asset) {
 		uriExtension = path.Ext(asset)
+
 		resource, err := d.getExternalResource(context, asset)
+		fmt.Printf("EXT: %v %v %v\n", resource, err, asset)
 		if err != nil {
 			return nil, err
 		}
@@ -623,6 +629,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string, error) {
 	resource, err := d.getExternalResource(context, strings.TrimSpace(assetURI))
 	var result string
+
 	var ext = path.Ext(resource.URL)
 	if ext == ".yaml" || ext == ".yml"{
 		var aMap = make(map[string]interface{})
