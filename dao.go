@@ -561,13 +561,10 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	} else if isExternalResource(asset) {
 		uriExtension = path.Ext(asset)
-
 		resource, err := d.getExternalResource(context, asset)
-		fmt.Printf("EXT: %v %v %v\n", resource, err, asset)
 		if err != nil {
 			return nil, err
 		}
-
 		assetContent, err = d.loadExternalResource(context, resource.URL)
 		if err != nil {
 			return nil, err
