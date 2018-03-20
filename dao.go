@@ -7,9 +7,9 @@ import (
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/storage"
 	"github.com/viant/toolbox/url"
+	"gopkg.in/yaml.v2"
 	"path"
 	"strings"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -431,10 +431,10 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 	}
 
 	if strings.Contains(URI, "://") || strings.HasPrefix(URI, "/") {
-		return url.NewResource(URI, context.source.Credential), nil
+		return url.NewResource(URI, context.source.Credentials), nil
 	}
 	ownerURL, URL := buildURLWithOwnerURL(context.source, context.tag.Subpath, URI)
-	service, err := storage.NewServiceForURL(URL, context.source.Credential)
+	service, err := storage.NewServiceForURL(URL, context.source.Credentials)
 	if err != nil {
 		return nil, err
 	}
@@ -443,7 +443,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 		if d.remoteResourceRepo != "" {
 			fallbackResource, err := d.NewRepoResource(context.context, URI)
 			if err == nil {
-				service, _ = storage.NewServiceForURL(fallbackResource.URL, context.source.Credential)
+				service, _ = storage.NewServiceForURL(fallbackResource.URL, context.source.Credentials)
 				if exists, _ = service.Exists(fallbackResource.URL); exists {
 					URL = fallbackResource.URL
 				}
@@ -454,7 +454,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 			URL = toolbox.FileSchema + fileCandidate
 		}
 	}
-	return url.NewResource(URL, context.source.Credential), nil
+	return url.NewResource(URL, context.source.Credentials), nil
 }
 
 //buildURLWithOwnerURL builds owner URL and candidate URL based on owner url, subpath if not empty, and URI
@@ -480,7 +480,7 @@ func buildURLWithOwnerURL(owner *url.Resource, subpath string, URI string) (stri
 	if URL == "" {
 		URL = toolbox.URLPathJoin(ownerURL, URI)
 
-		service, err := storage.NewServiceForURL(URL, owner.Credential)
+		service, err := storage.NewServiceForURL(URL, owner.Credentials)
 		if err == nil {
 			if exists, _ := service.Exists(URL); !exists {
 				for _, ext := range commonResourceExtensions {
@@ -619,7 +619,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
 }
 
@@ -628,7 +628,7 @@ func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string
 	var result string
 
 	var ext = path.Ext(resource.URL)
-	if ext == ".yaml" || ext == ".yml"{
+	if ext == ".yaml" || ext == ".yml" {
 		var aMap = make(map[string]interface{})
 		err = resource.Decode(&aMap)
 		if err != nil {

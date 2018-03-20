@@ -87,7 +87,7 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 		subPathParent = path.Join(subPathParent, candidate)
 		parentURL = toolbox.URLPathJoin(parentURL, candidate)
 	}
-	storageService, err := storage.NewServiceForURL(parentURL, t.OwnerSource.Credential)
+	storageService, err := storage.NewServiceForURL(parentURL, t.OwnerSource.Credentials)
 	if err == nil {
 		candidates, err := storageService.List(parentURL)
 		if err == nil {
@@ -141,7 +141,7 @@ func (t *Tag) TagID() string {
 		}
 	}
 	var tagIdPostfix = t.Group + index + subPath
-	if tagIdPostfix != "" && t.tagIdPrefix != ""{
+	if tagIdPostfix != "" && t.tagIdPrefix != "" {
 		tagIdPostfix = "_" + tagIdPostfix
 	}
 	value := t.tagIdPrefix + tagIdPostfix
