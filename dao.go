@@ -466,7 +466,7 @@ func buildURLWithOwnerURL(owner *url.Resource, subpath string, URI string) (stri
 		fileCandidate := toolbox.URLPathJoin(ownerURL, path.Join(subpath, URI))
 		fileCandidate = strings.Replace(fileCandidate, toolbox.FileSchema, "", 1)
 
-		if toolbox.FileExists(fileCandidate) {
+		if toolbox.FileExists(fileCandidate) && path.Ext(fileCandidate) != "" {
 			URL = toolbox.FileSchema + fileCandidate
 		} else if path.Ext(fileCandidate) == "" {
 			for _, ext := range commonResourceExtensions {
@@ -479,14 +479,14 @@ func buildURLWithOwnerURL(owner *url.Resource, subpath string, URI string) (stri
 	}
 	if URL == "" {
 		URL = toolbox.URLPathJoin(ownerURL, URI)
-
 		service, err := storage.NewServiceForURL(URL, owner.Credentials)
 		if err == nil {
-			if exists, _ := service.Exists(URL); !exists {
+			if object, _ := service.StorageObject(URL); object == nil || object.IsFolder() {
 				for _, ext := range commonResourceExtensions {
 					exists, _ := service.Exists(URL + ext)
 					if exists {
 						URL = URL + ext
+						break;
 					}
 				}
 			}

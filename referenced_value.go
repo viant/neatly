@@ -18,7 +18,7 @@ func (v *referenceValues) CheckUnused() error {
 	if len(unused) == 0 {
 		return nil
 	}
-	return fmt.Errorf("Unresolved references: %value", strings.Join(unused, ","))
+	return fmt.Errorf("Unresolved references: '%v' ", strings.Join(unused, ","))
 }
 
 func (v *referenceValues) Add(tagName string, field *Field, object data.Map) error {
