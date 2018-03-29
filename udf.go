@@ -117,7 +117,7 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 		}
 		candidate := path.Join(parentDirectory, toolbox.AsString(source))
 		if toolbox.FileExists(candidate) {
-			return candidate, nil
+			return true, nil
 		}
 	}
 	var result  = url.NewResource(filename).ParsedURL.Path
