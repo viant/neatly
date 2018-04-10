@@ -5,18 +5,19 @@ import (
 	"compress/gzip"
 	"crypto/md5"
 	"fmt"
-	"github.com/klauspost/pgzip"
-	"github.com/viant/toolbox"
-	"github.com/viant/toolbox/data"
-	"github.com/viant/toolbox/storage"
-	"github.com/viant/toolbox/url"
-	"gopkg.in/russross/blackfriday.v2"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/klauspost/pgzip"
+	"github.com/viant/toolbox"
+	"github.com/viant/toolbox/data"
+	"github.com/viant/toolbox/storage"
+	"github.com/viant/toolbox/url"
+	"gopkg.in/russross/blackfriday.v2"
 )
 
 //AsMap converts source into map
@@ -120,10 +121,9 @@ func HasResource(source interface{}, state data.Map) (interface{}, error) {
 			return true, nil
 		}
 	}
-	var result  = url.NewResource(filename).ParsedURL.Path
+	var result = url.NewResource(filename).ParsedURL.Path
 	return toolbox.FileExists(result), nil
 }
-
 
 //LoadNeatly loads neatly document as data structure, source represents path to nearly document
 func LoadNeatly(source interface{}, state data.Map) (interface{}, error) {
@@ -268,11 +268,16 @@ func Markdown(source interface{}, state data.Map) (interface{}, error) {
 
 //Cat returns content of supplied file name
 func Cat(source interface{}, state data.Map) (interface{}, error) {
-	var parentDirectory = ""
-	if state.Has(OwnerURL) {
-		parentDirectory, _ = GetOwnerDirectory(state)
+	candidate := url.NewResource(toolbox.AsString(source))
+	filename := candidate.ParsedURL.Path
+	if !toolbox.FileExists(filename) {
+		var parentDirectory = ""
+		if state.Has(OwnerURL) {
+			parentDirectory, _ = GetOwnerDirectory(state)
+		}
+		filename = path.Join(parentDirectory, toolbox.AsString(source))
 	}
-	filename := path.Join(parentDirectory, toolbox.AsString(source))
+
 	if !toolbox.FileExists(filename) {
 		var resource = url.NewResource(state.GetString(OwnerURL))
 		parentURL, _ := toolbox.URLSplit(resource.URL)
