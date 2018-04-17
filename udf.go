@@ -38,7 +38,7 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 
 //AsInt converts source into int
 func AsInt(source interface{}, state data.Map) (interface{}, error) {
-	return toolbox.AsInt(source), nil
+	return toolbox.ToInt(source)
 }
 
 //Add increment supplied state key with delta ['key', -2]
