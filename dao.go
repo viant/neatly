@@ -618,6 +618,10 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 			}
 		}
 	}
+
+	escaped := strings.Replace(assetContent, `"`, `\"`, len(assetContent))
+	escaped = strings.Replace(escaped, "\n", `\n`, len(escaped))
+	aMap[fmt.Sprintf("esc_arg%v", index)] = escaped
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
 	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 	return data.Map(aMap), nil
