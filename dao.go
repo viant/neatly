@@ -547,7 +547,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 	var aMap = make(map[string]interface{})
 	var uriExtension string
 	var assetContent = asset
-
+	var assetURL string
 	if strings.HasPrefix(strings.TrimSpace(asset), "$") {
 		asset = strings.TrimSpace(asset)
 		value, has := virtualObjects.GetValue(string(asset[1:]))
@@ -569,6 +569,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		if err != nil {
 			return nil, err
 		}
+		assetURL = resource.URL
 	}
 
 	assetContent = d.expandMeta(context, assetContent)
@@ -582,7 +583,6 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		for _, v := range mapSlice {
 			aMap[toolbox.AsString(v.Key)] = v
 		}
-
 	} else if strings.HasPrefix(assetContent, "{") {
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(assetContent)).Decode(&aMap)
 		if err != nil {
@@ -594,6 +594,9 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 		}
 	}
 
+	if d.includeMeta {
+		aMap["assetURL"] = assetURL
+	}
 	if escapeQuotes {
 		for k, v := range aMap {
 			if v == nil {
@@ -618,12 +621,15 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 			}
 		}
 	}
-
 	escaped := strings.Replace(assetContent, `"`, `\"`, len(assetContent))
 	escaped = strings.Replace(escaped, "\n", `\n`, len(escaped))
 	aMap[fmt.Sprintf("esc_arg%v", index)] = escaped
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
+
+
+
+
 	return data.Map(aMap), nil
 }
 
@@ -637,6 +643,9 @@ func (d *Dao) loadExternalResource(context *tagContext, assetURI string) (string
 		err = resource.Decode(&aMap)
 		if err != nil {
 			return "", err
+		}
+		if d.includeMeta {
+			aMap["assetURL"] = resource.URL
 		}
 		return toolbox.AsJSONText(aMap)
 	}

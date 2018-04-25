@@ -146,6 +146,13 @@ func Test_FormatTime(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 
+	{
+		value, err := neatly.FormatTime([]interface{}{"now", "yyyy", "UTC"}, nil)
+		assert.Nil(t, err)
+		now := time.Now()
+		assert.Equal(t, now.Year(), toolbox.AsInt(value))
+	}
+
 }
 
 func Test_Zip_Unzip(t *testing.T) {

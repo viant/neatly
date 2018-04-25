@@ -185,7 +185,7 @@ func FormatTime(source interface{}, state data.Map) (interface{}, error) {
 		return nil, fmt.Errorf("unable to run FormatTime: expected %T, but had: %T", []interface{}{}, source)
 	}
 	aSlice := toolbox.AsSlice(source)
-	if len(aSlice) != 2 {
+	if len(aSlice) < 2 {
 		return nil, fmt.Errorf("unable to run FormatTime, expected 2 parameters, but had: %v", len(aSlice))
 	}
 	var err error
@@ -201,6 +201,14 @@ func FormatTime(source interface{}, state data.Map) (interface{}, error) {
 	}
 	if err != nil {
 		return nil, err
+	}
+	if len(aSlice) > 2 {
+		timeLocation, err := time.LoadLocation(toolbox.AsString(aSlice[2]))
+		if err != nil {
+			return nil, err
+		}
+		timeInLocation := timeValue.In(timeLocation)
+		timeValue = &timeInLocation
 	}
 	return timeValue.Format(timeLayout), nil
 }
