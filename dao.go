@@ -241,6 +241,9 @@ func removeEmptyElements(tagObject map[string]interface{}) {
 		aSlice := toolbox.AsSlice(v)
 		var emptyCount = 0
 		for i := len(aSlice) - 1; i >= 0; i-- {
+			if aSlice[i] == nil {
+				break
+			}
 			if !toolbox.IsMap(aSlice[i]) {
 				break
 			}
