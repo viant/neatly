@@ -1,14 +1,15 @@
 package neatly_test
 
 import (
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/neatly"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
-	"strings"
-	"testing"
-	"time"
 )
 
 func Test_Md5(t *testing.T) {
@@ -216,4 +217,18 @@ func Test_Cat(t *testing.T) {
 		assert.Nil(t, err)
 		assert.True(t, content != "")
 	}
+}
+
+func Test_IsSON(t *testing.T) {
+	t.Run("Case to check if invalid JSON is validated", func(t *testing.T) {
+		assert.False(t, neatly.IsJSON(`{"name":"abc"},`, nil))
+		assert.False(t, neatly.IsJSON(`{"name":"abc}`, nil))
+		assert.False(t, neatly.IsJSON(`{"name":'abc'}`, nil))
+		assert.False(t, neatly.IsJSON(`[{"name":"abc"}`, nil))
+	})
+	t.Run("Case to check if valid JSON is validated", func(t *testing.T) {
+		assert.True(t, neatly.IsJSON(`{"name":"abc"}`, nil))
+		assert.True(t, neatly.IsJSON(`[{"name":"abc"}]`, nil))
+		assert.True(t, neatly.IsJSON(`[{"name":"abc"},{"name":"123"}]`, nil))
+	})
 }

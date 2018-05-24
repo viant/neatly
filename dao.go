@@ -3,13 +3,14 @@ package neatly
 import (
 	"bufio"
 	"fmt"
+	"path"
+	"strings"
+
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/storage"
 	"github.com/viant/toolbox/url"
 	"gopkg.in/yaml.v2"
-	"path"
-	"strings"
 )
 
 const (
@@ -77,6 +78,7 @@ func (d *Dao) AddStandardUdf(context data.Map) {
 	context.Put("UnzipText", UnzipText)
 	context.Put("Markdown", Markdown)
 	context.Put("Cat", Cat)
+	context.Put("IsJSON", IsJSON)
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
@@ -489,7 +491,7 @@ func buildURLWithOwnerURL(owner *url.Resource, subpath string, URI string) (stri
 					exists, _ := service.Exists(URL + ext)
 					if exists {
 						URL = URL + ext
-						break;
+						break
 					}
 				}
 			}
@@ -628,10 +630,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 	escaped = strings.Replace(escaped, "\n", `\n`, len(escaped))
 	aMap[fmt.Sprintf("esc_arg%v", index)] = escaped
 	aMap[fmt.Sprintf("arg%v", index)] = assetContent
-	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1: len(assetContent)-1])
-
-
-
+	aMap[fmt.Sprintf("args%v", index)] = string(assetContent[1 : len(assetContent)-1])
 
 	return data.Map(aMap), nil
 }

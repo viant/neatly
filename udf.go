@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -311,4 +312,10 @@ func Cat(source interface{}, state data.Map) (interface{}, error) {
 		return nil, err
 	}
 	return string(content), nil
+}
+
+// Validate if text is a well-formed JSON or not
+func IsJSON(s interface{}, state data.Map) bool {
+	var m json.RawMessage
+	return json.Unmarshal([]byte(toolbox.AsString(s)), &m) == nil
 }
