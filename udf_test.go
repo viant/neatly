@@ -226,12 +226,8 @@ func Test_IsSON(t *testing.T) {
 		input    string
 		expected bool
 	}{
-		{"Case to check if invalid JSON is validated", `{"name":"abc"},`, false},
-		{"Case to check if invalid JSON is validated", `{"name":"abc}`, false},
-		{"Case to check if invalid JSON is validated", `{"name":'abc'}`, false},
-		{"Case to check if invalid JSON is validated", `[{"name":"abc"}`, false},
-		{"Case to check if valid JSON is validated", `{"name":"abc"}`, true},
-		{"Case to check if valid JSON is validated", `[{"name":"abc"}]`, true},
+		{"Case to check if invalid JSON is validated", "test/invalid_file.json", false},
+		{"Case to check if valid JSON is validated", "test/valid_json_file.json", true},
 	}
 
 	for _, useCase := range useCases {
