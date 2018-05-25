@@ -314,8 +314,16 @@ func Cat(source interface{}, state data.Map) (interface{}, error) {
 	return string(content), nil
 }
 
-// Validate if text is a well-formed JSON or not
-func IsJSON(s interface{}, state data.Map) bool {
+// Validate if JSON file is a well-formed JSON
+// Returns true if file content is valid JSON
+func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
+	content, err := Cat(fileName, state)
+	if err != nil {
+		return false, err
+	}
 	var m json.RawMessage
-	return json.Unmarshal([]byte(toolbox.AsString(s)), &m) == nil
+	if err := json.Unmarshal([]byte(toolbox.AsString(content)), &m); err != nil {
+		return false, err
+	}
+	return true, nil
 }

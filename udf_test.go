@@ -220,15 +220,21 @@ func Test_Cat(t *testing.T) {
 }
 
 func Test_IsSON(t *testing.T) {
-	t.Run("Case to check if invalid JSON is validated", func(t *testing.T) {
-		assert.False(t, neatly.IsJSON(`{"name":"abc"},`, nil))
-		assert.False(t, neatly.IsJSON(`{"name":"abc}`, nil))
-		assert.False(t, neatly.IsJSON(`{"name":'abc'}`, nil))
-		assert.False(t, neatly.IsJSON(`[{"name":"abc"}`, nil))
-	})
-	t.Run("Case to check if valid JSON is validated", func(t *testing.T) {
-		assert.True(t, neatly.IsJSON(`{"name":"abc"}`, nil))
-		assert.True(t, neatly.IsJSON(`[{"name":"abc"}]`, nil))
-		assert.True(t, neatly.IsJSON(`[{"name":"abc"},{"name":"123"}]`, nil))
-	})
+	//Table driven tests
+	useCases := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		{"Case to check if invalid JSON is validated", "test/invalid_file.json", false},
+		{"Case to check if valid JSON is validated", "test/valid_json_file.json", true},
+	}
+
+	for _, useCase := range useCases {
+		t.Run(useCase.name, func(t *testing.T) {
+			isJson, _ := neatly.IsJSON(useCase.input, nil)
+			assert.Equal(t, useCase.expected, toolbox.AsBoolean(isJson))
+
+		})
+	}
 }
