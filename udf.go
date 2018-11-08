@@ -83,6 +83,7 @@ func Length(source interface{}, state data.Map) (interface{}, error) {
 	return 0, nil
 }
 
+
 //AsBool converts source into bool
 func AsBool(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.AsBoolean(source), nil
@@ -194,10 +195,7 @@ func FormatTime(source interface{}, state data.Map) (interface{}, error) {
 	var timeFormat = toolbox.AsString(aSlice[1])
 	var timeLayout = toolbox.DateFormatToLayout(timeFormat)
 	var timeValue *time.Time
-	if timeText == "now" {
-		var now = time.Now()
-		timeValue = &now
-	} else {
+	if timeValue, err = toolbox.TimeAt(timeText); err != nil {
 		timeValue, err = toolbox.ToTime(aSlice[0], timeLayout)
 	}
 	if err != nil {
