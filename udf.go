@@ -18,7 +18,7 @@ import (
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/storage"
 	"github.com/viant/toolbox/url"
-	"gopkg.in/russross/blackfriday.v2"
+	"github.com/gomarkdown/markdown"
 )
 
 //AsMap converts source into map
@@ -195,7 +195,8 @@ func FormatTime(source interface{}, state data.Map) (interface{}, error) {
 	var timeFormat = toolbox.AsString(aSlice[1])
 	var timeLayout = toolbox.DateFormatToLayout(timeFormat)
 	var timeValue *time.Time
-	if timeValue, err = toolbox.TimeAt(timeText); err != nil {
+	timeValue, err = toolbox.TimeAt(timeText);
+	if err != nil {
 		timeValue, err = toolbox.ToTime(aSlice[0], timeLayout)
 	}
 	if err != nil {
@@ -269,7 +270,7 @@ func Markdown(source interface{}, state data.Map) (interface{}, error) {
 	if err == nil && response != nil {
 		input = toolbox.AsString(response)
 	}
-	result := blackfriday.Run([]byte(input))
+	result := markdown.ToHTML([]byte(input), nil, nil)
 	return string(result), nil
 }
 

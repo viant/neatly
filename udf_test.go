@@ -139,7 +139,7 @@ func Test_FormatTime(t *testing.T) {
 		assert.NotNil(t, err)
 	}
 	{
-		_, err := neatly.FormatTime([]interface{}{"2015-02/11", "y-d"}, nil)
+		_, err := neatly.FormatTime([]interface{}{"201/02/11 2", "y-d"}, nil)
 		assert.NotNil(t, err)
 	}
 	{
