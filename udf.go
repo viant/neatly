@@ -13,12 +13,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gomarkdown/markdown"
 	"github.com/klauspost/pgzip"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/storage"
 	"github.com/viant/toolbox/url"
-	"github.com/gomarkdown/markdown"
 )
 
 //AsMap converts source into map
@@ -71,6 +71,7 @@ func AsFloat(source interface{}, state data.Map) (interface{}, error) {
 
 //Length returns length of slice or string
 func Length(source interface{}, state data.Map) (interface{}, error) {
+
 	if toolbox.IsSlice(source) {
 		return len(toolbox.AsSlice(source)), nil
 	}
@@ -82,7 +83,6 @@ func Length(source interface{}, state data.Map) (interface{}, error) {
 	}
 	return 0, nil
 }
-
 
 //AsBool converts source into bool
 func AsBool(source interface{}, state data.Map) (interface{}, error) {
@@ -195,7 +195,7 @@ func FormatTime(source interface{}, state data.Map) (interface{}, error) {
 	var timeFormat = toolbox.AsString(aSlice[1])
 	var timeLayout = toolbox.DateFormatToLayout(timeFormat)
 	var timeValue *time.Time
-	timeValue, err = toolbox.TimeAt(timeText);
+	timeValue, err = toolbox.TimeAt(timeText)
 	if err != nil {
 		timeValue, err = toolbox.ToTime(aSlice[0], timeLayout)
 	}
@@ -325,4 +325,26 @@ func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+//AddStandardUdf register building udf to the context
+func AddStandardUdf(state data.Map) {
+	state.Put("AsMap", AsMap)
+	state.Put("WorkingDirectory", WorkingDirectory)
+	state.Put("Pwd", WorkingDirectory)
+	state.Put("AsInt", AsInt)
+	state.Put("AsFloat", AsFloat)
+	state.Put("AsBool", AsBool)
+	state.Put("HasResource", HasResource)
+	state.Put("Md5", Md5)
+	state.Put("Length", Length)
+	state.Put("Len", Length)
+	state.Put("LoadNeatly", LoadNeatly)
+	state.Put("FormatTime", FormatTime)
+	state.Put("Zip", Zip)
+	state.Put("Unzip", Unzip)
+	state.Put("UnzipText", UnzipText)
+	state.Put("Markdown", Markdown)
+	state.Put("Cat", Cat)
+	state.Put("IsJSON", IsJSON)
 }

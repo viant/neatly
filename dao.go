@@ -40,7 +40,6 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	}
 	context.Put(OwnerURL, source.URL)
 	context.Put(NeatlyDao, d)
-	d.AddStandardUdf(context)
 	text = strings.Replace(text, "\r", "", len(text))
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	targetMap, err := d.load(context, source, scanner)
@@ -49,7 +48,6 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	}
 
 	var sourceMap = make(map[string]interface{})
-
 	err = d.converter.AssignConverted(&sourceMap, source)
 	if err != nil {
 		return err
@@ -62,23 +60,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 
 //AddStandardUdf register building udf to the context
 func (d *Dao) AddStandardUdf(context data.Map) {
-	context.Put("AsMap", AsMap)
-	context.Put("WorkingDirectory", WorkingDirectory)
-	context.Put("Pwd", WorkingDirectory)
-	context.Put("AsInt", AsInt)
-	context.Put("AsFloat", AsFloat)
-	context.Put("AsBool", AsBool)
-	context.Put("HasResource", HasResource)
-	context.Put("Md5", Md5)
-	context.Put("Length", Length)
-	context.Put("LoadNeatly", LoadNeatly)
-	context.Put("FormatTime", FormatTime)
-	context.Put("Zip", Zip)
-	context.Put("Unzip", Unzip)
-	context.Put("UnzipText", UnzipText)
-	context.Put("Markdown", Markdown)
-	context.Put("Cat", Cat)
-	context.Put("IsJSON", IsJSON)
+	AddStandardUdf(context)
 }
 
 //processTag creates a data structure in the result data.Map, it also check if the referenceValue for tag was Used before unless it is the first tag (result tag)
