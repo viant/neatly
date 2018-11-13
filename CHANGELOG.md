@@ -1,4 +1,4 @@
-## Nov 8 2018 - v0.2.2
+## Nov 8 2018 - v0.2.3
   * Decoupled UDF from dao
   * Added $Len udf 
 
