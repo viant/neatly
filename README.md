@@ -632,7 +632,7 @@ In order to convert then to int data type, AsInt user defined function is being 
 
 ### External resources arguments inlining
 
-In case the whole content us subsequent arguments needs to be inlined, you can use  $argsX reference.
+In case where the whole content of subsequent arguments needs to be inlined, you can use  $argsX reference.
 
 Neatly tabular alternative representation.
 
