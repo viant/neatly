@@ -518,6 +518,7 @@ Note that external lookup first check if resource exists in subpath if not it wi
 same directory as a master file (source of the tabular data).
 
 
+<a name="external_resource_substitution></a>
 ### External resources loading with content substitution and user defined function (udf) use case.
 
 
@@ -604,9 +605,31 @@ use case 2
 ```
 
 In this case content of the @customer.json were substituted with dailyCap and overallCap values.
-Since customer represents valid JSON, dailyCap and overallCap are being substitute.
-Note that there are being expaned in double qoutes thus they became of text type.
+Since customer and cap data represents valid data structure, dailyCap and overallCap are substituted.
+
+
+The following construct in a cell
+ 
+    @customer.json | {"dailyCap":100, "overallCap":1000}
+
+can be replaced with two or more external JSON or YAML resources (with space or pipe) providing desired data structure.
+
+    @customer.json @cap.json
+
+    
+where 
+@cap.json
+
+```json
+ {"dailyCap":100, "overallCap":1000}
+```     
+
+
+Note that xxx_CAP values were expanded within double quote thus they became of text type.
 In order to convert then to int data type, AsInt user defined function is being used.
+
+
+
 
 Space (or pipe) can used to provide additional external substitution source, it can be a JSON object, or another external resource to JSON or YAML file.
 Pipe can be used to separate inline sources.
