@@ -949,7 +949,7 @@ Usage of neatly:
     	<output format> json or yaml (default "json")
   -i string
     	<neatly document path> 
-  -v	neatly version
+  -m	include meta data -m=true
 
 ```
 
