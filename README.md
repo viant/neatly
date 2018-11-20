@@ -937,6 +937,12 @@ To prevent line loading into document , **//** can be used at the beginning of t
 [Download](https://github.com/viant/neatly/releases) or build latest neatly.
 
 
+
+```bash
+neatly -i=test/use_case1.csv -f=yaml
+```
+
+
 ```text
  $ neatly -h
 Usage of neatly:
@@ -947,8 +953,6 @@ Usage of neatly:
   -v	neatly version
   -f string
     	<output format> json or yaml (default "json")
-  -i string
-    	<neatly document path> 
   -m	include meta data -m=true
 
 ```
