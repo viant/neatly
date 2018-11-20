@@ -630,11 +630,9 @@ In order to convert then to int data type, AsInt user defined function is being 
 
 
 
+### External resources arguments inlining
 
-Space (or pipe) can used to provide additional external substitution source, it can be a JSON object, or another external resource to JSON or YAML file.
-Pipe can be used to separate inline sources.
-Multi source substitution is supported.
-
+In case the whole content us subsequent arguments needs to be inlined, you can use  $argsX reference.
 
 Neatly tabular alternative representation.
 
