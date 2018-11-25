@@ -116,7 +116,7 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	}
 	value, has := record["Subpath"]
 	if has {
-		t.Subpath = t.expandPathIfNeeded(toolbox.AsString(value))
+		t.SetSubPath(toolbox.AsString(value))
 	}
 	if t.Subpath != "" {
 		object["Subpath"] = t.Subpath
@@ -126,6 +126,11 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	}
 	object["TagID"] = t.TagID()
 
+}
+
+//SetSubPath set subpath for the tag
+func (t *Tag) SetSubPath(subpath string) {
+	t.Subpath = t.expandPathIfNeeded(subpath)
 }
 
 //TagID returns tag ID
@@ -167,6 +172,10 @@ func NewTag(ownerName string, ownerSource *url.Resource, key string, lineNumber 
 	if len(key) > 2 && string(key[0:2]) == "[]" {
 		result.Name = string(key[2:])
 		result.IsArray = true
+	}
+
+	if rangeIndex := strings.LastIndex(result.Name, "{"); rangeIndex != -1 {
+		result.Name = string(result.Name[:rangeIndex])
 	}
 
 	if ownerName != "" {

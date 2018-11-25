@@ -216,6 +216,10 @@ func isMapValueEmpty(aMap map[string]interface{}) bool {
 //removeEmptyElements remove empty slice element from the end
 func removeEmptyElements(tagObject map[string]interface{}) {
 	for k, v := range tagObject {
+		if v == nil {
+			delete(tagObject, k)
+			continue
+		}
 		if toolbox.IsMap(v) {
 			removeEmptyElements(toolbox.AsMap(v))
 		}
@@ -410,9 +414,7 @@ func (d *Dao) getExternalResource(context *tagContext, URI string) (*url.Resourc
 	if URI == "" {
 		return nil, fmt.Errorf("resource  was empty")
 	}
-
 	URI = strings.TrimSpace(URI)
-
 	if strings.HasPrefix(URI, "@") || strings.HasPrefix(URI, "#") {
 		URI = string(URI[1:])
 	}
