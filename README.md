@@ -272,7 +272,7 @@ In order to reference virtual  object dollar sign expression is being used.
 
 <a name="tagiterator"></a>
 
-### Loading repeated data with an object tag iterator range expression use case.
+### Loading repeated data with tags template.   
 
 
    Take as example the following data structure:
