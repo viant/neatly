@@ -116,14 +116,14 @@ Neatly tabular representation.
  
 | Root | UseCase | []Requests.Method  | []Requests.URL| []Requests.Cookies | []Expect.StatusCode | []Expect.Body | Comments |
 | --- | --- | --- | --- | --- |--- | --- | --- |
-| | case 1 |  GET | http://127.0.0.1/test1 | {"Cookie1":"value1", "Cookie1":"value2"}   |  200  | testContent | {{123}} |
+| | case 1 |  GET | http://127.0.0.1/test1 | {"Cookie1":"value1", "Cookie1":"value2"}   |  200  | testContent | {!123!} |
 | | | GET | http://127.0.0.1/test2 | {"Cookie1":"value1", "Cookie1":"value2"}   |  404  |  | |
 
   
 In this case we have only one object tag called root which has simple and repeated fields.  
 Note that {} or [] prefix, sufix in an object value converts value to an object or array respectively.
-You can escape **{** ... **}**  with **{{** ... **}}** quote 
-or  **[** ... **]** with **[[** ... **]]** to represent value as text instead.
+You can escape **{** ... **}**  with **{!** ... **!}** quote 
+or  **[** ... **]** with **[!** ... **!]** to represent value as text instead.
  
 ###  One to many with forward object tag reference use case
  

@@ -1,3 +1,6 @@
+## Nov 13 2018 - v0.3.0
+  * Refactored escape sequence, integrated with new data parser
+
 ## Nov 13 2018 - v0.2.3
   * Decoupled UDF from dao
   * Added $Len udf 
