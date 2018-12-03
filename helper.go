@@ -20,19 +20,20 @@ func unescapeSpecialCharacters(input string) (string, bool) {
 		fallthrough
 	case "##":
 		fallthrough
-	case "[[":
+	case "[!":
 		fallthrough
-	case "{{":
-		result = string(result[1:])
+	case "{!":
+		result = string(result[0:1]) + string(result[2:])
 		unescaped = true
 	}
 
 	lastSequence := string(result[len(result)-2:])
 	switch lastSequence {
-	case "]]":
-		fallthrough
-	case "}}":
-		result = string(result[:len(result)-1])
+	case "!]":
+		result = string(result[:len(result)-2])+"]"
+		unescaped = true
+	case "!}":
+		result = string(result[:len(result)-2])+"}"
 		unescaped = true
 	}
 	return result, unescaped
