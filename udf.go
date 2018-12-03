@@ -42,6 +42,20 @@ func AsInt(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.ToInt(source)
 }
 
+
+
+//AsInt converts source into int
+func AsString(source interface{}, state data.Map) (interface{}, error) {
+	if toolbox.IsSlice(source) || toolbox.IsMap(source) || toolbox.IsStruct(source) {
+		text, err := toolbox.AsJSONText(source)
+		if err == nil {
+			return text, nil
+		}
+	}
+	return toolbox.AsString(source), nil
+
+}
+
 //Add increment supplied state key with delta ['key', -2]
 func Increment(args interface{}, state data.Map) (interface{}, error) {
 	if toolbox.IsSlice(args) {
@@ -333,6 +347,7 @@ func AddStandardUdf(state data.Map) {
 	state.Put("WorkingDirectory", WorkingDirectory)
 	state.Put("Pwd", WorkingDirectory)
 	state.Put("AsInt", AsInt)
+	state.Put("AsString", AsString)
 	state.Put("AsFloat", AsFloat)
 	state.Put("AsBool", AsBool)
 	state.Put("HasResource", HasResource)
