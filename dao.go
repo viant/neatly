@@ -40,6 +40,7 @@ func (d *Dao) Load(context data.Map, source *url.Resource, target interface{}) e
 	}
 	context.Put(OwnerURL, source.URL)
 	context.Put(NeatlyDao, d)
+	AddStandardUdf(context)
 	text = strings.Replace(text, "\r", "", len(text))
 	scanner := bufio.NewScanner(strings.NewReader(text))
 	targetMap, err := d.load(context, source, scanner)
@@ -598,6 +599,7 @@ func (d *Dao) loadMap(context *tagContext, asset string, escapeQuotes bool, inde
 				}
 				v = text
 			}
+
 			if toolbox.IsString(v) {
 				textValue := toolbox.AsString(v)
 				if strings.Contains(textValue, "\"") {
@@ -671,6 +673,8 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 	if strings.HasPrefix(value, "$") && !strings.Contains(value, "(") {
 		return virtualObjects.Expand(value), nil
 	} else if isExternalResource(value) {
+
+
 		if len(virtualObjects) > 0 {
 			value = virtualObjects.ExpandAsText(value)
 		}
@@ -683,11 +687,9 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		mainAsset = d.expandMeta(context, mainAsset)
 		value = mainAsset
 	}
-
 	if len(assets) == 0 && strings.Contains(value, "|") && strings.HasPrefix(value, "[") {
 		assets = getAssetURIs(value)
 	}
-
 	if len(assets) > 1 {
 		escapeQuotes := strings.HasPrefix(value, "{") || strings.HasPrefix(value, "[")
 		for i := 1; i < len(assets); i++ {
@@ -695,10 +697,10 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 			if err != nil {
 				return nil, err
 			}
+
 			value = aMap.ExpandAsText(value)
 		}
 	}
-
 	result, err := asDataStructure(value)
 	if err == nil {
 		result = context.context.Expand(result)
