@@ -23,9 +23,11 @@ import (
 
 //AsMap converts source into map
 func AsMap(source interface{}, state data.Map) (interface{}, error) {
+
 	if source == nil || toolbox.IsMap(source) {
 		return source, nil
 	}
+	source = convertToTextIfNeeded(source)
 	if toolbox.IsString(source) {
 		aMap := make(map[string]interface{})
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aMap)
@@ -42,6 +44,7 @@ func AsCollection(source interface{}, state data.Map) (interface{}, error) {
 	if source == nil || toolbox.IsMap(source) {
 		return source, nil
 	}
+	source = convertToTextIfNeeded(source)
 	if toolbox.IsString(source) {
 		aSlice := []interface{}{}
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice)
@@ -58,6 +61,7 @@ func AsData(source interface{}, state data.Map) (interface{}, error) {
 	if source == nil || toolbox.IsMap(source) || toolbox.IsSlice(source) {
 		return source, nil
 	}
+	source = convertToTextIfNeeded(source)
 	if toolbox.IsString(source) {
 		var result interface{}
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&result)
@@ -67,6 +71,13 @@ func AsData(source interface{}, state data.Map) (interface{}, error) {
 		return result, nil
 	}
 	return source, nil
+}
+
+func convertToTextIfNeeded(data interface{}) interface{} {
+	if bs, ok := data.([]byte); ok {
+		return string(bs)
+	}
+	return data
 }
 
 //AsInt converts source into int
@@ -371,16 +382,34 @@ func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
 	return true, nil
 }
 
+// Join joins slice by separator
+func Join(args interface{}, state data.Map) (interface{}, error) {
+	if !toolbox.IsSlice(args) {
+		return nil, fmt.Errorf("expected 2 arguments but had: %T", args)
+	}
+	arguments := toolbox.AsSlice(args)
+	if len(arguments) != 2 {
+		return nil, fmt.Errorf("expected 2 arguments but had: %v", len(arguments))
+	}
+
+	if !toolbox.IsSlice(arguments[0]) {
+		return nil, fmt.Errorf("expected 1st arguments as slice but had: %T", arguments[0])
+	}
+	var result = make([]string, 0)
+	toolbox.CopySliceElements(arguments[0], &result)
+	return strings.Join(result, toolbox.AsString(arguments[1])), nil
+}
+
 //AddStandardUdf register building udf to the context
 func AddStandardUdf(state data.Map) {
 	state.Put("AsMap", AsMap)
 	state.Put("AsData", AsData)
+	state.Put("AsCollection", AsCollection)
 	state.Put("AsInt", AsInt)
 	state.Put("AsString", AsString)
 	state.Put("AsFloat", AsFloat)
 	state.Put("AsBool", AsBool)
 
-	state.Put("AsCollection", AsCollection)
 	state.Put("WorkingDirectory", WorkingDirectory)
 	state.Put("Pwd", WorkingDirectory)
 	state.Put("HasResource", HasResource)
@@ -395,5 +424,6 @@ func AddStandardUdf(state data.Map) {
 	state.Put("Markdown", Markdown)
 	state.Put("Cat", Cat)
 	state.Put("IsJSON", IsJSON)
+	state.Put("Join", Join)
 
 }

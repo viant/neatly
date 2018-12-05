@@ -113,6 +113,18 @@ func Test_AsData(t *testing.T) {
 
 }
 
+func Test_Join(t *testing.T) {
+	{
+		var joined, err = neatly.Join([]interface{}{
+			[]interface{}{1, 2, 3},
+			",",
+		}, nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, joined)
+		assert.EqualValues(t, "1,2,3", joined)
+	}
+}
+
 func Test_AsBool(t *testing.T) {
 	ok, err := neatly.AsBool("true", nil)
 	assert.Nil(t, err)
