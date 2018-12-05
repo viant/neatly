@@ -37,12 +37,42 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.ToMap(source)
 }
 
+//AsCollection converts source into a slice
+func AsCollection(source interface{}, state data.Map) (interface{}, error) {
+	if source == nil || toolbox.IsMap(source) {
+		return source, nil
+	}
+	if toolbox.IsString(source) {
+		aSlice := []interface{}{}
+		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice)
+		if err != nil {
+			return nil, err
+		}
+		return aSlice, nil
+	}
+	return toolbox.AsSlice(source), nil
+}
+
+//AsData converts source into map or slice
+func AsData(source interface{}, state data.Map) (interface{}, error) {
+	if source == nil || toolbox.IsMap(source) || toolbox.IsSlice(source) {
+		return source, nil
+	}
+	if toolbox.IsString(source) {
+		var result interface{}
+		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+	return source, nil
+}
+
 //AsInt converts source into int
 func AsInt(source interface{}, state data.Map) (interface{}, error) {
 	return toolbox.ToInt(source)
 }
-
-
 
 //AsInt converts source into int
 func AsString(source interface{}, state data.Map) (interface{}, error) {
@@ -344,12 +374,15 @@ func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
 //AddStandardUdf register building udf to the context
 func AddStandardUdf(state data.Map) {
 	state.Put("AsMap", AsMap)
-	state.Put("WorkingDirectory", WorkingDirectory)
-	state.Put("Pwd", WorkingDirectory)
+	state.Put("AsData", AsData)
 	state.Put("AsInt", AsInt)
 	state.Put("AsString", AsString)
 	state.Put("AsFloat", AsFloat)
 	state.Put("AsBool", AsBool)
+
+	state.Put("AsCollection", AsCollection)
+	state.Put("WorkingDirectory", WorkingDirectory)
+	state.Put("Pwd", WorkingDirectory)
 	state.Put("HasResource", HasResource)
 	state.Put("Md5", Md5)
 	state.Put("Length", Length)
@@ -362,4 +395,5 @@ func AddStandardUdf(state data.Map) {
 	state.Put("Markdown", Markdown)
 	state.Put("Cat", Cat)
 	state.Put("IsJSON", IsJSON)
+
 }

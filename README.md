@@ -732,24 +732,26 @@ In order to define udf please use the following function signature:
 
 ```
 
-Builtin udf'
+Build-in udf'
 
-1) AsMap
-2) AsInt
-3) AsFloat
-4) AsBool 
-5) HasResource returns true if external resource exists
-6) Md5 generates md5 for provided parameter
-7) WorkingDirectory returns working directory joined with supplied sub path,  '../' is supported.
-8) LoadNeatly loads neatly document as data structure.
-9) Length returns length of slice, map or string
-9) FormatTime, takes two arguments, date or now, followed by java style date format
-10) Zip, takes []byte or string to compress it.
-11) Unzip, takes []byte to uncompress it into []byte.
-12) UnzipText takes []byte to uncompress it into string.
-13) Markdown generate HTML for suppied markdown
-14) Cat returns content of supplied filename
-15) Increment increments state key value with supplied delta  i.e. $Increment(['counterKey', -2]), returns total
+-  AsMap - convert source into a map
+-  AsCollection - convert source into a slice
+-  AsData - convert source into a map or slice
+-  AsInt - convert source into a an int
+-  AsFloat - convert source into a a float
+-  AsBool  - convert source into a boolean
+-  HasResource returns true if external resource exists
+-  Md5 generates md5 for provided parameter
+-  WorkingDirectory returns working directory joined with supplied sub path,  '../' is supported.
+-  LoadNeatly loads neatly document as data structure.
+-  Length returns length of slice, map or string
+-  FormatTime, takes two arguments, date or now, followed by java style date format
+-  Zip, takes []byte or string to compress it.
+-  Unzip, takes []byte to uncompress it into []byte.
+-  UnzipText takes []byte to uncompress it into string.
+-  Markdown generate HTML for suppied markdown
+-  Cat returns content of supplied filename
+-  Increment increments state key value with supplied delta  i.e. $Increment(['counterKey', -2]), returns total
 
 ### External resources loading with virtual object value substitution use case.
 
