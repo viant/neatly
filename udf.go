@@ -41,6 +41,7 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 
 //AsCollection converts source into a slice
 func AsCollection(source interface{}, state data.Map) (interface{}, error) {
+	source = convertToTextIfNeeded(source)
 	if source == nil || toolbox.IsMap(source) {
 		return source, nil
 	}
@@ -58,10 +59,11 @@ func AsCollection(source interface{}, state data.Map) (interface{}, error) {
 
 //AsData converts source into map or slice
 func AsData(source interface{}, state data.Map) (interface{}, error) {
+	source = convertToTextIfNeeded(source)
 	if source == nil || toolbox.IsMap(source) || toolbox.IsSlice(source) {
 		return source, nil
 	}
-	source = convertToTextIfNeeded(source)
+
 	if toolbox.IsString(source) {
 		var result interface{}
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&result)
@@ -74,6 +76,9 @@ func AsData(source interface{}, state data.Map) (interface{}, error) {
 }
 
 func convertToTextIfNeeded(data interface{}) interface{} {
+	if data == nil {
+		return data
+	}
 	if bs, ok := data.([]byte); ok {
 		return string(bs)
 	}
