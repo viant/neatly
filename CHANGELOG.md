@@ -1,3 +1,8 @@
+## Dec 4 2018 - v0.4.1
+  *  AsCollection - convert source into a slice
+  *  AsData - convert source into a map or slice
+
+
 ## Dec 3 2018 - v0.4.0
   * Refactored escape sequence, integrated with new data parser
 

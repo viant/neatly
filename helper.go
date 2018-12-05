@@ -30,10 +30,10 @@ func unescapeSpecialCharacters(input string) (string, bool) {
 	lastSequence := string(result[len(result)-2:])
 	switch lastSequence {
 	case "!]":
-		result = string(result[:len(result)-2])+"]"
+		result = string(result[:len(result)-2]) + "]"
 		unescaped = true
 	case "!}":
-		result = string(result[:len(result)-2])+"}"
+		result = string(result[:len(result)-2]) + "}"
 		unescaped = true
 	}
 	return result, unescaped

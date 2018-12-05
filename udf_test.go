@@ -1,6 +1,7 @@
 package neatly_test
 
 import (
+	"github.com/viant/assertly"
 	"strings"
 	"testing"
 	"time"
@@ -74,6 +75,42 @@ func Test_AsMap(t *testing.T) {
 		_, err := neatly.AsMap("{\"abc\":1, \"a}", nil)
 		assert.NotNil(t, err)
 	}
+}
+
+func Test_AsCollection(t *testing.T) {
+
+	{
+		var aSlice, err = neatly.AsCollection([]interface{}{1}, nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, aSlice)
+	}
+	{
+		var aSlice, err = neatly.AsCollection("[1,2]", nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, aSlice)
+		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
+	}
+
+	{
+		_, err := neatly.AsCollection("[\"a,2]", nil)
+		assert.NotNil(t, err)
+	}
+}
+
+func Test_AsData(t *testing.T) {
+	{
+		var aSlice, err = neatly.AsData("[1,2]", nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, aSlice)
+		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
+	}
+	{
+		var aMap, err = neatly.AsData("{\"abc\":1}", nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, aMap)
+		assertly.AssertValues(t, "{\"abc\":1}", aMap)
+	}
+
 }
 
 func Test_AsBool(t *testing.T) {

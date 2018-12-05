@@ -674,7 +674,6 @@ func (d *Dao) normalizeValue(context *tagContext, value string) (interface{}, er
 		return virtualObjects.Expand(value), nil
 	} else if isExternalResource(value) {
 
-
 		if len(virtualObjects) > 0 {
 			value = virtualObjects.ExpandAsText(value)
 		}
