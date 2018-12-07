@@ -1,3 +1,6 @@
+## Dec 7 2018 - v0.4.2
+  *  patched nil pointer in $Cat udf
+
 ## Dec 4 2018 - v0.4.1
   *  AsCollection - convert source into a slice
   *  AsData - convert source into a map or slice

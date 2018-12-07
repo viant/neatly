@@ -15,9 +15,21 @@ import (
 
 func Test_Md5(t *testing.T) {
 
-	var md5, err = neatly.Md5("www.viewability.com", nil)
+
+	var md5, err = neatly.Md5("554257_popularmechanics.com", nil)
 	assert.Nil(t, err)
-	assert.EqualValues(t, "123c274fb9a25ddbc77c1634f1e55525", md5)
+	assert.EqualValues(t, "ed045d398e8e1924486afa44acbb6b82", md5)
+
+
+
+	aMap := data.NewMap()
+	aMap.Put("md5", neatly.Md5)
+
+	var text ="11$md5(554257_popularmechanics.com)22"
+	expanded := aMap.ExpandAsText(text)
+	assert.EqualValues(t, "11ed045d398e8e1924486afa44acbb6b8222", expanded)
+
+
 }
 
 func Test_WorkingDirectory(t *testing.T) {

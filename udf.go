@@ -336,8 +336,11 @@ func Markdown(source interface{}, state data.Map) (interface{}, error) {
 
 //Cat returns content of supplied file name
 func Cat(source interface{}, state data.Map) (interface{}, error) {
-	candidate := url.NewResource(toolbox.AsString(source))
-	filename := candidate.ParsedURL.Path
+	filename := toolbox.AsString(source)
+	candidate := url.NewResource(filename)
+	if candidate != nil || candidate.ParsedURL != nil {
+		filename = candidate.ParsedURL.Path
+	}
 	if !toolbox.FileExists(filename) {
 		var parentDirectory = ""
 		if state.Has(OwnerURL) {
@@ -345,11 +348,11 @@ func Cat(source interface{}, state data.Map) (interface{}, error) {
 		}
 		filename = path.Join(parentDirectory, toolbox.AsString(source))
 	}
-
 	if !toolbox.FileExists(filename) {
+		filename := toolbox.AsString(source)
 		var resource = url.NewResource(state.GetString(OwnerURL))
 		parentURL, _ := toolbox.URLSplit(resource.URL)
-		var URL = toolbox.URLPathJoin(parentURL, toolbox.AsString(source))
+		var URL = toolbox.URLPathJoin(parentURL, filename)
 		service, err := storage.NewServiceForURL(URL, "")
 		if err == nil {
 			if exists, _ := service.Exists(URL); exists {
