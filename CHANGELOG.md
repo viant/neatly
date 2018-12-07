@@ -1,4 +1,4 @@
-## Dec 7 2018 - v0.4.2
+## Dec 7 2018 - v0.4.4
   *  patched nil pointer in $Cat udf
 
 ## Dec 4 2018 - v0.4.1
