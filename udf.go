@@ -59,6 +59,29 @@ func Values(source interface{}, state data.Map) (interface{}, error) {
 }
 
 
+//IndexOf returns index of the matched slice elements or -1
+func IndexOf(source interface{}, state data.Map) (interface{}, error) {
+	if toolbox.IsSlice(source) {
+		return nil, fmt.Errorf("expected arguments but had: %T", source)
+	}
+	args := toolbox.AsSlice(source)
+	if len(args) !=2 {
+		return nil, fmt.Errorf("expected 2 arguments but had: %v", len(args))
+	}
+
+	collection, err := AsCollection(args[0], state)
+	if err != nil {
+		return nil, err
+	}
+	for i, candidate := range toolbox.AsSlice(collection) {
+		if candidate == args[1] || toolbox.AsString(candidate) == toolbox.AsString(args[1]) {
+			return i, nil
+		}
+	}
+	return -1, nil
+}
+
+
 //AsMap converts source into map
 func AsMap(source interface{}, state data.Map) (interface{}, error) {
 

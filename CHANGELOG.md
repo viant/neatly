@@ -1,5 +1,5 @@
 ## Dec 11 2018 - v0.4.4
-  *  Added Values and Keys udfs
+  *  Added Values, Key and IndexOf udfs
 
 ## Dec 7 2018 - v0.4.4
   *  patched nil pointer in $Cat udf
