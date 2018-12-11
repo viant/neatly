@@ -21,6 +21,44 @@ import (
 	"github.com/viant/toolbox/url"
 )
 
+
+
+//Keys returns keys of the supplied map
+func Keys(source interface{}, state data.Map) (interface{}, error) {
+	aMap, err := AsMap(source, state)
+	if err != nil {
+		return nil, err
+	}
+	var result = make([]interface{}, 0)
+	err = toolbox.ProcessMap(aMap, func(key, value interface{}) bool {
+		result = append(result, key)
+		return true
+	});
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+
+//Values returns values of the supplied map
+func Values(source interface{}, state data.Map) (interface{}, error) {
+	aMap, err := AsMap(source, state)
+	if err != nil {
+		return nil, err
+	}
+	var result = make([]interface{}, 0)
+	err = toolbox.ProcessMap(aMap, func(key, value interface{}) bool {
+		result = append(result, value)
+		return true
+	});
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+
 //AsMap converts source into map
 func AsMap(source interface{}, state data.Map) (interface{}, error) {
 
@@ -433,5 +471,6 @@ func AddStandardUdf(state data.Map) {
 	state.Put("Cat", Cat)
 	state.Put("IsJSON", IsJSON)
 	state.Put("Join", Join)
-
+	state.Put("Keys", Keys)
+	state.Put("Values", Values)
 }

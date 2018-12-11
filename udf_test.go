@@ -89,6 +89,40 @@ func Test_AsMap(t *testing.T) {
 	}
 }
 
+
+
+func Test_Keys(t *testing.T) {
+
+	{
+		var keys, err = neatly.Keys(map[string]interface{}{}, nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, keys)
+	}
+	{
+		var keys, err = neatly.Keys("{\"abc\":1}", nil)
+		assert.Nil(t, err)
+		assert.EqualValues(t, []interface{}{"abc"} , keys)
+	}
+}
+
+
+func Test_Values(t *testing.T) {
+
+	{
+		var keys, err = neatly.Values(map[string]interface{}{}, nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, keys)
+	}
+	{
+		var keys, err = neatly.Values("{\"abc\":1}", nil)
+		assert.Nil(t, err)
+		assert.EqualValues(t, []interface{}{1.0} , keys)
+	}
+}
+
+
+
+
 func Test_AsCollection(t *testing.T) {
 
 	{
