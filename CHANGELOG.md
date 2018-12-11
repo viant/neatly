@@ -1,4 +1,4 @@
-## Dec 11 2018 - v0.4.4
+## Dec 11 2018 - v0.5.0
   *  Added Values, Key and IndexOf udfs
 
 ## Dec 7 2018 - v0.4.4
