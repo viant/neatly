@@ -342,7 +342,7 @@ Note that number of digits in the upper bound range value creates a padding temp
 
 **$path** expands to current path if sub path is specified for the tag
 
-**$pathMatch** expands to wildcarded subPath  
+**$pathMatch** expands to resolved wildcard subPath fragment  
 
 
 ### Data delegation and loading external resources use case
