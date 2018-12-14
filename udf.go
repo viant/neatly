@@ -88,9 +88,7 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 		aMap := make(map[string]interface{})
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aMap)
 		if err != nil {
-			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aMap);e!= nil {
-				return nil, err
-			}
+			return nil, err
 		}
 		return aMap, nil
 	}

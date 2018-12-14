@@ -67,7 +67,6 @@ func Test_HasResource(t *testing.T) {
 }
 
 func Test_AsMap(t *testing.T) {
-
 	{
 		var aMap, err = neatly.AsMap(map[string]interface{}{}, nil)
 		assert.Nil(t, err)
@@ -78,7 +77,6 @@ func Test_AsMap(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, aMap)
 	}
-
 	{
 		_, err := neatly.AsMap("{\"abc\":1, \"a}", nil)
 		assert.NotNil(t, err)
@@ -122,6 +120,14 @@ func Test_AsCollection(t *testing.T) {
 	}
 	{
 		var aSlice, err = neatly.AsCollection("[1,2]", nil)
+		assert.Nil(t, err)
+		assert.NotNil(t, aSlice)
+		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
+	}
+	{
+		var aSlice, err = neatly.AsCollection(`
+- 1
+- 2`, nil)
 		assert.Nil(t, err)
 		assert.NotNil(t, aSlice)
 		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
