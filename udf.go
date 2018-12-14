@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"os"
@@ -106,7 +107,9 @@ func AsCollection(source interface{}, state data.Map) (interface{}, error) {
 		aSlice := []interface{}{}
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice)
 		if err != nil {
-			return nil, err
+			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice);e!= nil {
+				return nil, err
+			}
 		}
 		return aSlice, nil
 	}
