@@ -1,9 +1,7 @@
 package neatly_test
 
 import (
-	"fmt"
 	"github.com/viant/assertly"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -324,18 +322,4 @@ func Test_IsSON(t *testing.T) {
 
 		})
 	}
-}
-
-
-func Test_NestedUDF( t *testing.T) {
-
-	expr:=`$Join($AsCollection($Cat(${env.HOME}/arrayww.json)), ",")`
-	var aMap = data.NewMap()
-	aMap.Put("env", func(key string) (interface{}) {
-		return os.Getenv(key)
-	})
-	neatly.AddStandardUdf(aMap)
-	expanded := aMap.Expand(expr)
-	fmt.Printf("E: %v \n", expanded)
-
 }
