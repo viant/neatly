@@ -80,7 +80,6 @@ func IndexOf(source interface{}, state data.Map) (interface{}, error) {
 
 //AsMap converts source into map
 func AsMap(source interface{}, state data.Map) (interface{}, error) {
-
 	if source == nil || toolbox.IsMap(source) {
 		return source, nil
 	}
@@ -89,7 +88,9 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 		aMap := make(map[string]interface{})
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aMap)
 		if err != nil {
-			return nil, err
+			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aMap);e!= nil {
+				return nil, err
+			}
 		}
 		return aMap, nil
 	}
