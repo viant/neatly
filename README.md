@@ -342,6 +342,8 @@ Note that number of digits in the upper bound range value creates a padding temp
 
 **$path** expands to current path if sub path is specified for the tag
 
+**$pathMatch** expands to wildcarded subPath  
+
 
 ### Data delegation and loading external resources use case
 
@@ -923,6 +925,7 @@ thus they should be treated as reserved keyword,  unless object needs to expose 
  1) **TagId** tag id of currently processing tag (concatenation of Tag name, Group if specified, Index if within Tag Range, Subpath is specified).
  2) **TagIndex** index value if within tag range.
  3) **Subpath**  defines subpath.
+ 4) **PathMatch**  defines matched subpath.
 
 
 ### Comments
