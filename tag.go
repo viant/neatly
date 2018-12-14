@@ -20,6 +20,7 @@ type Tag struct {
 	Iterator    *TagIterator
 	LineNumber  int
 	Subpath     string
+	PathMatch   string
 	tagIdPrefix string
 }
 
@@ -46,23 +47,12 @@ func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}, i
 	}
 	value, has := record["Subpath"]
 	if has {
-		t.Subpath = t.expandPathIfNeeded(toolbox.AsString(value))
+		t.Subpath, t.PathMatch = t.expandPathIfNeeded(toolbox.AsString(value))
 	}
 	if t.Subpath != "" {
 		context.Subpath = t.Subpath
 	}
 	context.tagID = t.TagID()
-
-	/*
-
-		tagName  string
-		tagIndex string
-		Subpath string
-		tagID string
-
-
-
-	*/
 
 	if includeMeta {
 		t.setMeta(result, record)
@@ -71,9 +61,9 @@ func (t *Tag) setTagObject(context *tagContext, record map[string]interface{}, i
 	return result
 }
 
-func (t *Tag) expandPathIfNeeded(subpath string) string {
+func (t *Tag) expandPathIfNeeded(subpath string) (string, string) {
 	if !strings.HasSuffix(subpath, "*") {
-		return subpath
+		return subpath, ""
 	}
 	parentURL, _ := toolbox.URLSplit(t.OwnerSource.URL)
 	var leafDirectory = ""
@@ -97,15 +87,16 @@ func (t *Tag) expandPathIfNeeded(subpath string) string {
 				}
 				_, candidateName := toolbox.URLSplit(candidate.URL())
 				if strings.HasPrefix(candidateName, leafDirectory) {
+
 					if subPathParent != "" {
-						return path.Join(subPathParent, candidateName)
+						return path.Join(subPathParent, candidateName), string(candidateName[len(leafDirectory):])
 					}
-					return candidateName
+					return candidateName, string(candidateName[len(leafDirectory):])
 				}
 			}
 		}
 	}
-	return subpath
+	return subpath, ""
 }
 
 //setMeta sets Tag, optionally TagIndex and Subpath to the provided object
@@ -114,12 +105,17 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 	if t.HasActiveIterator() {
 		object["TagIndex"] = t.Iterator.Index()
 	}
+
 	value, has := record["Subpath"]
 	if has {
 		t.SetSubPath(toolbox.AsString(value))
 	}
 	if t.Subpath != "" {
 		object["Subpath"] = t.Subpath
+	}
+
+	if t.PathMatch != "" {
+		object["PathMatch"] = t.PathMatch
 	}
 	if value, has := record["Group"]; has {
 		t.Group = toolbox.AsString(value)
@@ -128,9 +124,18 @@ func (t *Tag) setMeta(object data.Map, record map[string]interface{}) {
 
 }
 
+func (t *Tag) Expand(text string) string {
+	var aMap = data.NewMap()
+	aMap.Put("pathMatch", t.PathMatch)
+	aMap.Put("subPath", t.Subpath)
+	aMap.Put("index", t.Iterator.Index())
+	aMap.Put("idx", toolbox.AsInt(t.Iterator.Index()))
+	return aMap.ExpandAsText(text)
+}
+
 //SetSubPath set subpath for the tag
 func (t *Tag) SetSubPath(subpath string) {
-	t.Subpath = t.expandPathIfNeeded(subpath)
+	t.Subpath, t.PathMatch = t.expandPathIfNeeded(subpath)
 }
 
 //TagID returns tag ID
@@ -139,18 +144,25 @@ func (t *Tag) TagID() string {
 	if t.HasActiveIterator() {
 		index = t.Iterator.Index()
 	}
+
 	var subPath = t.Subpath
 	if subPath != "" {
 		if strings.Contains(subPath, index) {
 			index = ""
 		}
 	}
+	if strings.Contains(t.Name, "$") {
+		expandedName := t.Expand(t.Name)
+		if strings.Contains(subPath, expandedName) {
+			subPath = ""
+		}
+	}
 	var tagIdPostfix = t.Group + index + subPath
 	if tagIdPostfix != "" && t.tagIdPrefix != "" {
 		tagIdPostfix = "_" + tagIdPostfix
 	}
-	value := t.tagIdPrefix + tagIdPostfix
 
+	value := t.Expand(t.tagIdPrefix + tagIdPostfix)
 	var result = make([]byte, 0)
 	for _, r := range value {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {

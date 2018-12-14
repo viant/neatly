@@ -15,20 +15,16 @@ import (
 
 func Test_Md5(t *testing.T) {
 
-
 	var md5, err = neatly.Md5("554257_popularmechanics.com", nil)
 	assert.Nil(t, err)
 	assert.EqualValues(t, "ed045d398e8e1924486afa44acbb6b82", md5)
 
-
-
 	aMap := data.NewMap()
 	aMap.Put("md5", neatly.Md5)
 
-	var text ="11$md5(554257_popularmechanics.com)22"
+	var text = "11$md5(554257_popularmechanics.com)22"
 	expanded := aMap.ExpandAsText(text)
 	assert.EqualValues(t, "11ed045d398e8e1924486afa44acbb6b8222", expanded)
-
 
 }
 
@@ -89,8 +85,6 @@ func Test_AsMap(t *testing.T) {
 	}
 }
 
-
-
 func Test_Keys(t *testing.T) {
 
 	{
@@ -101,10 +95,9 @@ func Test_Keys(t *testing.T) {
 	{
 		var keys, err = neatly.Keys("{\"abc\":1}", nil)
 		assert.Nil(t, err)
-		assert.EqualValues(t, []interface{}{"abc"} , keys)
+		assert.EqualValues(t, []interface{}{"abc"}, keys)
 	}
 }
-
 
 func Test_Values(t *testing.T) {
 
@@ -116,12 +109,9 @@ func Test_Values(t *testing.T) {
 	{
 		var keys, err = neatly.Values("{\"abc\":1}", nil)
 		assert.Nil(t, err)
-		assert.EqualValues(t, []interface{}{1.0} , keys)
+		assert.EqualValues(t, []interface{}{1.0}, keys)
 	}
 }
-
-
-
 
 func Test_AsCollection(t *testing.T) {
 

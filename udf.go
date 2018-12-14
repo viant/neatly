@@ -21,8 +21,6 @@ import (
 	"github.com/viant/toolbox/url"
 )
 
-
-
 //Keys returns keys of the supplied map
 func Keys(source interface{}, state data.Map) (interface{}, error) {
 	aMap, err := AsMap(source, state)
@@ -33,13 +31,12 @@ func Keys(source interface{}, state data.Map) (interface{}, error) {
 	err = toolbox.ProcessMap(aMap, func(key, value interface{}) bool {
 		result = append(result, key)
 		return true
-	});
+	})
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
-
 
 //Values returns values of the supplied map
 func Values(source interface{}, state data.Map) (interface{}, error) {
@@ -51,13 +48,12 @@ func Values(source interface{}, state data.Map) (interface{}, error) {
 	err = toolbox.ProcessMap(aMap, func(key, value interface{}) bool {
 		result = append(result, value)
 		return true
-	});
+	})
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
-
 
 //IndexOf returns index of the matched slice elements or -1
 func IndexOf(source interface{}, state data.Map) (interface{}, error) {
@@ -65,7 +61,7 @@ func IndexOf(source interface{}, state data.Map) (interface{}, error) {
 		return nil, fmt.Errorf("expected arguments but had: %T", source)
 	}
 	args := toolbox.AsSlice(source)
-	if len(args) !=2 {
+	if len(args) != 2 {
 		return nil, fmt.Errorf("expected 2 arguments but had: %v", len(args))
 	}
 
@@ -80,7 +76,6 @@ func IndexOf(source interface{}, state data.Map) (interface{}, error) {
 	}
 	return -1, nil
 }
-
 
 //AsMap converts source into map
 func AsMap(source interface{}, state data.Map) (interface{}, error) {
