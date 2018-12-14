@@ -1,3 +1,6 @@
+## Dec 14 2018 - v0.5.1
+  *  Introduced pathMatch variable
+
 ## Dec 11 2018 - v0.5.0
   *  Added Values, Key and IndexOf udfs
 
