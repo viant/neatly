@@ -106,7 +106,7 @@ func AsCollection(source interface{}, state data.Map) (interface{}, error) {
 		aSlice := []interface{}{}
 		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice)
 		if err != nil {
-			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice);e!= nil {
+			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice); e != nil {
 				return nil, err
 			}
 		}

@@ -128,8 +128,10 @@ func (t *Tag) Expand(text string) string {
 	var aMap = data.NewMap()
 	aMap.Put("pathMatch", t.PathMatch)
 	aMap.Put("subPath", t.Subpath)
-	aMap.Put("index", t.Iterator.Index())
-	aMap.Put("idx", toolbox.AsInt(t.Iterator.Index()))
+	if t.Iterator != nil {
+		aMap.Put("index", t.Iterator.Index())
+		aMap.Put("idx", toolbox.AsInt(t.Iterator.Index()))
+	}
 	return aMap.ExpandAsText(text)
 }
 
