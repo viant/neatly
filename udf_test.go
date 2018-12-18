@@ -1,7 +1,10 @@
 package neatly_test
 
 import (
+	"fmt"
 	"github.com/viant/assertly"
+	"log"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -328,4 +331,48 @@ func Test_IsSON(t *testing.T) {
 
 		})
 	}
+}
+
+
+func Test_YamlAsCollection(t *testing.T) {
+	var YAML = `- Requests:
+    - URL: http://localhost:5000
+      Method: GET
+      Header:
+        aHeader:
+          - "myField=a-value; path=/; domain=localhost; Expires=Tue, 19 Jan 2038 03:14:07 GMT;"
+        someOtherHeader:
+          - "CP=RTO"
+
+      Body: "hey there"
+      Cookies:
+        - Name: aHeader
+          Value: a-value
+          DYAMLomain: "localhost"
+          Expires: "2023-12-16T20:17:38Z"
+          RawExpires: Sat, 16 Dec 2023 20:17:38 GMT`
+
+	expanded, err := neatly.AsCollection(YAML, nil)
+	if ! assert.Nil(t, err) {
+		log.Fatal(err)
+	}
+	assert.Equal(t, reflect.Slice, reflect.TypeOf(expanded).Kind())
+	theFirstItem := toolbox.AsSlice(expanded)[0]
+	fmt.Printf("theFirstItem: %T %v\n", theFirstItem, theFirstItem)
+
+}
+
+
+func Test_YamlAsMap(t *testing.T) {
+
+
+	YAML := `default: &default
+  Name: Jack
+person: 
+  <<: *default
+  Name: Bob`
+
+	expanded, err := neatly.AsMap(YAML, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, expanded)
 }
