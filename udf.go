@@ -84,16 +84,21 @@ func AsMap(source interface{}, state data.Map) (interface{}, error) {
 		return source, nil
 	}
 	source = convertToTextIfNeeded(source)
-	if toolbox.IsString(source) {
-		aMap := make(map[string]interface{})
-		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aMap)
-		if err != nil {
-			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aMap); e != nil {
+
+	if text, ok := source.(string); ok {
+		text = strings.TrimSpace(text)
+		aMap := map[string]interface{}{}
+		if strings.HasPrefix(text, "{") || strings.HasSuffix(text, "}") {
+			if err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(text)).Decode(&aMap); err != nil {
 				return nil, err
 			}
 		}
+		if err := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aMap); err != nil {
+			return nil, err
+		}
 		return aMap, nil
 	}
+
 	return toolbox.ToMap(source)
 }
 
@@ -104,13 +109,17 @@ func AsCollection(source interface{}, state data.Map) (interface{}, error) {
 		return source, nil
 	}
 	source = convertToTextIfNeeded(source)
-	if toolbox.IsString(source) {
-		aSlice := []interface{}{}
-		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice)
-		if err != nil {
-			if e := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice); e != nil {
+	if text, ok := source.(string); ok {
+		text = strings.TrimSpace(text)
+		if strings.HasPrefix(text, "[") || strings.HasSuffix(text, "[") {
+			aSlice := []interface{}{}
+			if err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(text)).Decode(&aSlice); err != nil {
 				return nil, err
 			}
+		}
+		var aSlice interface{}
+		if err := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice); err != nil {
+			return nil, err
 		}
 		return aSlice, nil
 	}

@@ -110,7 +110,7 @@ func Test_Values(t *testing.T) {
 	{
 		var keys, err = neatly.Values("{\"abc\":1}", nil)
 		assert.Nil(t, err)
-		assert.EqualValues(t, []interface{}{1.0}, keys)
+		assert.EqualValues(t, []interface{}{1}, keys)
 	}
 }
 
@@ -333,7 +333,6 @@ func Test_IsSON(t *testing.T) {
 	}
 }
 
-
 func Test_YamlAsCollection(t *testing.T) {
 	var YAML = `- Requests:
     - URL: http://localhost:5000
@@ -353,7 +352,7 @@ func Test_YamlAsCollection(t *testing.T) {
           RawExpires: Sat, 16 Dec 2023 20:17:38 GMT`
 
 	expanded, err := neatly.AsCollection(YAML, nil)
-	if ! assert.Nil(t, err) {
+	if !assert.Nil(t, err) {
 		log.Fatal(err)
 	}
 	assert.Equal(t, reflect.Slice, reflect.TypeOf(expanded).Kind())
@@ -362,9 +361,7 @@ func Test_YamlAsCollection(t *testing.T) {
 
 }
 
-
 func Test_YamlAsMap(t *testing.T) {
-
 
 	YAML := `default: &default
   Name: Jack
@@ -372,7 +369,7 @@ person:
   <<: *default
   Name: Bob`
 
-	expanded, err := neatly.AsMap(YAML, nil)
+	expanded, err := neatly.AsCollection(YAML, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, expanded)
 }
