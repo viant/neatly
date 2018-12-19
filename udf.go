@@ -6,217 +6,19 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"github.com/gomarkdown/markdown"
+	"github.com/klauspost/pgzip"
+	"github.com/viant/toolbox"
+	"github.com/viant/toolbox/data"
+	"github.com/viant/toolbox/data/udf"
+	"github.com/viant/toolbox/storage"
+	"github.com/viant/toolbox/url"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
-	"time"
-
-	"github.com/gomarkdown/markdown"
-	"github.com/klauspost/pgzip"
-	"github.com/viant/toolbox"
-	"github.com/viant/toolbox/data"
-	"github.com/viant/toolbox/storage"
-	"github.com/viant/toolbox/url"
 )
-
-//Keys returns keys of the supplied map
-func Keys(source interface{}, state data.Map) (interface{}, error) {
-	aMap, err := AsMap(source, state)
-	if err != nil {
-		return nil, err
-	}
-	var result = make([]interface{}, 0)
-	err = toolbox.ProcessMap(aMap, func(key, value interface{}) bool {
-		result = append(result, key)
-		return true
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-//Values returns values of the supplied map
-func Values(source interface{}, state data.Map) (interface{}, error) {
-	aMap, err := AsMap(source, state)
-	if err != nil {
-		return nil, err
-	}
-	var result = make([]interface{}, 0)
-	err = toolbox.ProcessMap(aMap, func(key, value interface{}) bool {
-		result = append(result, value)
-		return true
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-//IndexOf returns index of the matched slice elements or -1
-func IndexOf(source interface{}, state data.Map) (interface{}, error) {
-	if toolbox.IsSlice(source) {
-		return nil, fmt.Errorf("expected arguments but had: %T", source)
-	}
-	args := toolbox.AsSlice(source)
-	if len(args) != 2 {
-		return nil, fmt.Errorf("expected 2 arguments but had: %v", len(args))
-	}
-
-	collection, err := AsCollection(args[0], state)
-	if err != nil {
-		return nil, err
-	}
-	for i, candidate := range toolbox.AsSlice(collection) {
-		if candidate == args[1] || toolbox.AsString(candidate) == toolbox.AsString(args[1]) {
-			return i, nil
-		}
-	}
-	return -1, nil
-}
-
-//AsMap converts source into map
-func AsMap(source interface{}, state data.Map) (interface{}, error) {
-	if source == nil || toolbox.IsMap(source) {
-		return source, nil
-	}
-	source = convertToTextIfNeeded(source)
-
-	if text, ok := source.(string); ok {
-		text = strings.TrimSpace(text)
-		aMap := map[string]interface{}{}
-		if strings.HasPrefix(text, "{") || strings.HasSuffix(text, "}") {
-			if err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(text)).Decode(&aMap); err != nil {
-				return nil, err
-			}
-		}
-		if err := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aMap); err != nil {
-			return nil, err
-		}
-		return aMap, nil
-	}
-
-	return toolbox.ToMap(source)
-}
-
-//AsCollection converts source into a slice
-func AsCollection(source interface{}, state data.Map) (interface{}, error) {
-	source = convertToTextIfNeeded(source)
-	if source == nil || toolbox.IsMap(source) {
-		return source, nil
-	}
-	source = convertToTextIfNeeded(source)
-	if text, ok := source.(string); ok {
-		text = strings.TrimSpace(text)
-		if strings.HasPrefix(text, "[") || strings.HasSuffix(text, "[") {
-			aSlice := []interface{}{}
-			if err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(text)).Decode(&aSlice); err != nil {
-				return nil, err
-			}
-		}
-		var aSlice interface{}
-		if err := yaml.NewDecoder(strings.NewReader(toolbox.AsString(source))).Decode(&aSlice); err != nil {
-			return nil, err
-		}
-		return aSlice, nil
-	}
-	return toolbox.AsSlice(source), nil
-}
-
-//AsData converts source into map or slice
-func AsData(source interface{}, state data.Map) (interface{}, error) {
-	source = convertToTextIfNeeded(source)
-	if source == nil || toolbox.IsMap(source) || toolbox.IsSlice(source) {
-		return source, nil
-	}
-
-	if toolbox.IsString(source) {
-		var result interface{}
-		err := toolbox.NewJSONDecoderFactory().Create(strings.NewReader(toolbox.AsString(source))).Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		return result, nil
-	}
-	return source, nil
-}
-
-func convertToTextIfNeeded(data interface{}) interface{} {
-	if data == nil {
-		return data
-	}
-	if bs, ok := data.([]byte); ok {
-		return string(bs)
-	}
-	return data
-}
-
-//AsInt converts source into int
-func AsInt(source interface{}, state data.Map) (interface{}, error) {
-	return toolbox.ToInt(source)
-}
-
-//AsInt converts source into int
-func AsString(source interface{}, state data.Map) (interface{}, error) {
-	if toolbox.IsSlice(source) || toolbox.IsMap(source) || toolbox.IsStruct(source) {
-		text, err := toolbox.AsJSONText(source)
-		if err == nil {
-			return text, nil
-		}
-	}
-	return toolbox.AsString(source), nil
-
-}
-
-//Add increment supplied state key with delta ['key', -2]
-func Increment(args interface{}, state data.Map) (interface{}, error) {
-	if toolbox.IsSlice(args) {
-		return nil, fmt.Errorf("args were not slice: %T", args)
-	}
-	aSlice := toolbox.AsSlice(args)
-	if len(aSlice) != 2 {
-		return nil, fmt.Errorf("expeted 2 arguments but had: %v", len(aSlice))
-
-	}
-	var delta = toolbox.AsInt(aSlice[1])
-	var exrp = toolbox.AsString(aSlice[0])
-	value, has := state.GetValue(exrp)
-	if !has {
-		state.SetValue(exrp, delta)
-	} else {
-		state.SetValue(exrp, delta+toolbox.AsInt(value))
-	}
-	value, _ = state.GetValue(exrp)
-	return value, nil
-}
-
-//AsFloat converts source into float64
-func AsFloat(source interface{}, state data.Map) (interface{}, error) {
-	return toolbox.AsFloat(source), nil
-}
-
-//Length returns length of slice or string
-func Length(source interface{}, state data.Map) (interface{}, error) {
-
-	if toolbox.IsSlice(source) {
-		return len(toolbox.AsSlice(source)), nil
-	}
-	if toolbox.IsMap(source) {
-		return len(toolbox.AsMap(source)), nil
-	}
-	if text, ok := source.(string); ok {
-		return len(text), nil
-	}
-	return 0, nil
-}
-
-//AsBool converts source into bool
-func AsBool(source interface{}, state data.Map) (interface{}, error) {
-	return toolbox.AsBoolean(source), nil
-}
 
 //Md5 computes source md5
 func Md5(source interface{}, state data.Map) (interface{}, error) {
@@ -308,38 +110,6 @@ func WorkingDirectory(source interface{}, state data.Map) (interface{}, error) {
 		return currentDirectory, nil
 	}
 	return path.Join(currentDirectory, subPath), nil
-}
-
-//FormatTime return formatted time, it takes an array of two arguments, the first id time, or now followed by java style time format.
-func FormatTime(source interface{}, state data.Map) (interface{}, error) {
-	if !toolbox.IsSlice(source) {
-		return nil, fmt.Errorf("unable to run FormatTime: expected %T, but had: %T", []interface{}{}, source)
-	}
-	aSlice := toolbox.AsSlice(source)
-	if len(aSlice) < 2 {
-		return nil, fmt.Errorf("unable to run FormatTime, expected 2 parameters, but had: %v", len(aSlice))
-	}
-	var err error
-	var timeText = toolbox.AsString(aSlice[0])
-	var timeFormat = toolbox.AsString(aSlice[1])
-	var timeLayout = toolbox.DateFormatToLayout(timeFormat)
-	var timeValue *time.Time
-	timeValue, err = toolbox.TimeAt(timeText)
-	if err != nil {
-		timeValue, err = toolbox.ToTime(aSlice[0], timeLayout)
-	}
-	if err != nil {
-		return nil, err
-	}
-	if len(aSlice) > 2 {
-		timeLocation, err := time.LoadLocation(toolbox.AsString(aSlice[2]))
-		if err != nil {
-			return nil, err
-		}
-		timeInLocation := timeValue.In(timeLocation)
-		timeValue = &timeInLocation
-	}
-	return timeValue.Format(timeLayout), nil
 }
 
 //Unzip uncompress supplied []byte or error
@@ -459,49 +229,18 @@ func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
 	return true, nil
 }
 
-// Join joins slice by separator
-func Join(args interface{}, state data.Map) (interface{}, error) {
-	if !toolbox.IsSlice(args) {
-		return nil, fmt.Errorf("expected 2 arguments but had: %T", args)
-	}
-	arguments := toolbox.AsSlice(args)
-	if len(arguments) != 2 {
-		return nil, fmt.Errorf("expected 2 arguments but had: %v", len(arguments))
-	}
-
-	if !toolbox.IsSlice(arguments[0]) {
-		return nil, fmt.Errorf("expected 1st arguments as slice but had: %T", arguments[0])
-	}
-	var result = make([]string, 0)
-	toolbox.CopySliceElements(arguments[0], &result)
-	return strings.Join(result, toolbox.AsString(arguments[1])), nil
-}
-
 //AddStandardUdf register building udf to the context
-func AddStandardUdf(state data.Map) {
-	state.Put("AsMap", AsMap)
-	state.Put("AsData", AsData)
-	state.Put("AsCollection", AsCollection)
-	state.Put("AsInt", AsInt)
-	state.Put("AsString", AsString)
-	state.Put("AsFloat", AsFloat)
-	state.Put("AsBool", AsBool)
-
-	state.Put("WorkingDirectory", WorkingDirectory)
-	state.Put("Pwd", WorkingDirectory)
-	state.Put("HasResource", HasResource)
-	state.Put("Md5", Md5)
-	state.Put("Length", Length)
-	state.Put("Len", Length)
-	state.Put("LoadNeatly", LoadNeatly)
-	state.Put("FormatTime", FormatTime)
-	state.Put("Zip", Zip)
-	state.Put("Unzip", Unzip)
-	state.Put("UnzipText", UnzipText)
-	state.Put("Markdown", Markdown)
-	state.Put("Cat", Cat)
-	state.Put("IsJSON", IsJSON)
-	state.Put("Join", Join)
-	state.Put("Keys", Keys)
-	state.Put("Values", Values)
+func AddStandardUdf(aMap data.Map) {
+	udf.Register(aMap)
+	aMap.Put("IsJSON", IsJSON)
+	aMap.Put("WorkingDirectory", WorkingDirectory)
+	aMap.Put("Pwd", WorkingDirectory)
+	aMap.Put("HasResource", HasResource)
+	aMap.Put("Md5", Md5)
+	aMap.Put("LoadNeatly", LoadNeatly)
+	aMap.Put("Zip", Zip)
+	aMap.Put("Unzip", Unzip)
+	aMap.Put("UnzipText", UnzipText)
+	aMap.Put("Markdown", Markdown)
+	aMap.Put("Cat", Cat)
 }

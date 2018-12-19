@@ -1,19 +1,13 @@
 package neatly_test
 
 import (
-	"fmt"
-	"github.com/viant/assertly"
-	"log"
-	"reflect"
-	"strings"
-	"testing"
-	"time"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/viant/neatly"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
 	"github.com/viant/toolbox/url"
+	"strings"
+	"testing"
 )
 
 func Test_Md5(t *testing.T) {
@@ -67,187 +61,6 @@ func Test_HasResource(t *testing.T) {
 		assert.Nil(t, err)
 		assert.True(t, toolbox.AsBoolean(has))
 	}
-}
-
-func Test_AsMap(t *testing.T) {
-	{
-		var aMap, err = neatly.AsMap(map[string]interface{}{}, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aMap)
-	}
-	{
-		var aMap, err = neatly.AsMap("{\"abc\":1}", nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aMap)
-	}
-	{
-		_, err := neatly.AsMap("{\"abc\":1, \"a}", nil)
-		assert.NotNil(t, err)
-	}
-}
-
-func Test_Keys(t *testing.T) {
-
-	{
-		var keys, err = neatly.Keys(map[string]interface{}{}, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, keys)
-	}
-	{
-		var keys, err = neatly.Keys("{\"abc\":1}", nil)
-		assert.Nil(t, err)
-		assert.EqualValues(t, []interface{}{"abc"}, keys)
-	}
-}
-
-func Test_Values(t *testing.T) {
-
-	{
-		var keys, err = neatly.Values(map[string]interface{}{}, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, keys)
-	}
-	{
-		var keys, err = neatly.Values("{\"abc\":1}", nil)
-		assert.Nil(t, err)
-		assert.EqualValues(t, []interface{}{1}, keys)
-	}
-}
-
-func Test_AsCollection(t *testing.T) {
-
-	{
-		var aSlice, err = neatly.AsCollection([]interface{}{1}, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aSlice)
-	}
-	{
-		var aSlice, err = neatly.AsCollection("[1,2]", nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aSlice)
-		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
-	}
-	{
-		var aSlice, err = neatly.AsCollection(`
-- 1
-- 2`, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aSlice)
-		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
-	}
-
-	{
-		_, err := neatly.AsCollection("[\"a,2]", nil)
-		assert.NotNil(t, err)
-	}
-}
-
-func Test_AsData(t *testing.T) {
-	{
-		var aSlice, err = neatly.AsData("[1,2]", nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aSlice)
-		assertly.AssertValues(t, []interface{}{1, 2}, aSlice)
-	}
-	{
-		var aMap, err = neatly.AsData("{\"abc\":1}", nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, aMap)
-		assertly.AssertValues(t, "{\"abc\":1}", aMap)
-	}
-
-}
-
-func Test_Join(t *testing.T) {
-	{
-		var joined, err = neatly.Join([]interface{}{
-			[]interface{}{1, 2, 3},
-			",",
-		}, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, joined)
-		assert.EqualValues(t, "1,2,3", joined)
-	}
-}
-
-func Test_AsBool(t *testing.T) {
-	ok, err := neatly.AsBool("true", nil)
-	assert.Nil(t, err)
-	assert.Equal(t, true, ok)
-}
-
-func Test_AsFloat(t *testing.T) {
-	value, err := neatly.AsFloat(0.3, nil)
-	assert.Nil(t, err)
-	assert.Equal(t, 0.3, value)
-}
-
-func Test_AsInt(t *testing.T) {
-	value, err := neatly.AsInt(4.3, nil)
-	assert.Nil(t, err)
-	assert.Equal(t, 4, value)
-}
-
-func Test_Length(t *testing.T) {
-	{
-		value, err := neatly.Length(4.3, nil)
-		assert.Nil(t, err)
-		assert.Equal(t, 0, value)
-	}
-	{
-		value, err := neatly.Length("abcd", nil)
-		assert.Nil(t, err)
-		assert.Equal(t, 4, value)
-	}
-	{
-		value, err := neatly.Length(map[int]int{
-			2: 3,
-			1: 1,
-			6: 3,
-		}, nil)
-		assert.Nil(t, err)
-		assert.Equal(t, 3, value)
-	}
-	{
-		value, err := neatly.Length([]int{1, 2, 3}, nil)
-		assert.Nil(t, err)
-		assert.Equal(t, 3, value)
-	}
-}
-
-func Test_FormatTime(t *testing.T) {
-
-	{
-		value, err := neatly.FormatTime([]interface{}{"now", "yyyy"}, nil)
-		assert.Nil(t, err)
-		now := time.Now()
-		assert.Equal(t, now.Year(), toolbox.AsInt(value))
-	}
-	{
-		value, err := neatly.FormatTime([]interface{}{"2015-02-11", "yyyy"}, nil)
-		assert.Nil(t, err)
-		assert.Equal(t, 2015, toolbox.AsInt(value))
-	}
-	{
-		_, err := neatly.FormatTime([]interface{}{"2015-02-11"}, nil)
-		assert.NotNil(t, err)
-	}
-	{
-		_, err := neatly.FormatTime([]interface{}{"201/02/11 2", "y-d"}, nil)
-		assert.NotNil(t, err)
-	}
-	{
-		_, err := neatly.FormatTime("a", nil)
-		assert.NotNil(t, err)
-	}
-
-	{
-		value, err := neatly.FormatTime([]interface{}{"now", "yyyy", "UTC"}, nil)
-		assert.Nil(t, err)
-		now := time.Now()
-		assert.Equal(t, now.Year(), toolbox.AsInt(value))
-	}
-
 }
 
 func Test_Zip_Unzip(t *testing.T) {
@@ -331,45 +144,4 @@ func Test_IsSON(t *testing.T) {
 
 		})
 	}
-}
-
-func Test_YamlAsCollection(t *testing.T) {
-	var YAML = `- Requests:
-    - URL: http://localhost:5000
-      Method: GET
-      Header:
-        aHeader:
-          - "myField=a-value; path=/; domain=localhost; Expires=Tue, 19 Jan 2038 03:14:07 GMT;"
-        someOtherHeader:
-          - "CP=RTO"
-
-      Body: "hey there"
-      Cookies:
-        - Name: aHeader
-          Value: a-value
-          DYAMLomain: "localhost"
-          Expires: "2023-12-16T20:17:38Z"
-          RawExpires: Sat, 16 Dec 2023 20:17:38 GMT`
-
-	expanded, err := neatly.AsCollection(YAML, nil)
-	if !assert.Nil(t, err) {
-		log.Fatal(err)
-	}
-	assert.Equal(t, reflect.Slice, reflect.TypeOf(expanded).Kind())
-	theFirstItem := toolbox.AsSlice(expanded)[0]
-	fmt.Printf("theFirstItem: %T %v\n", theFirstItem, theFirstItem)
-
-}
-
-func Test_YamlAsMap(t *testing.T) {
-
-	YAML := `default: &default
-  Name: Jack
-person: 
-  <<: *default
-  Name: Bob`
-
-	expanded, err := neatly.AsCollection(YAML, nil)
-	assert.Nil(t, err)
-	assert.NotNil(t, expanded)
 }
