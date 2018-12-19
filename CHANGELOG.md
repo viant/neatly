@@ -1,4 +1,4 @@
-## Dec 14 2018 - v0.6.0
+## Dec 18 2018 - v0.6.0
   *  Moved standard udf to toolbox/data/udf project
 
 ## Dec 14 2018 - v0.5.1
