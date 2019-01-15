@@ -175,6 +175,15 @@ func Markdown(source interface{}, state data.Map) (interface{}, error) {
 
 //Cat returns content of supplied file name
 func Cat(source interface{}, state data.Map) (interface{}, error) {
+	content, err := LoadBinary(source, state)
+	if err != nil {
+		return nil, err
+	}
+	return toolbox.AsString(content), err
+}
+
+//LoadBinary returns []byte content of supplied file name
+func LoadBinary(source interface{}, state data.Map) (interface{}, error) {
 	filename := toolbox.AsString(source)
 	candidate := url.NewResource(filename)
 	if candidate != nil || candidate.ParsedURL != nil {
@@ -212,7 +221,7 @@ func Cat(source interface{}, state data.Map) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return string(content), nil
+	return content, nil
 }
 
 // Validate if JSON file is a well-formed JSON
@@ -243,4 +252,5 @@ func AddStandardUdf(aMap data.Map) {
 	aMap.Put("UnzipText", UnzipText)
 	aMap.Put("Markdown", Markdown)
 	aMap.Put("Cat", Cat)
+	aMap.Put("LoadBinary", LoadBinary)
 }
