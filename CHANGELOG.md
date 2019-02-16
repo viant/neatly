@@ -1,3 +1,6 @@
+## Feb 15 2018 - v0.7.0
+  * Added BinaryAssetsToMap, AssetsToMap udfs
+
 ## Dec 18 2018 - v0.6.0
   *  Moved standard udf to toolbox/data/udf project
 

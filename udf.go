@@ -224,6 +224,77 @@ func LoadBinary(source interface{}, state data.Map) (interface{}, error) {
 	return content, nil
 }
 
+//AssetsToMap loads assets into map[string]string, it takes url, with optional list of extension as filter
+func AssetsToMap(source interface{}, state data.Map) (interface{}, error) {
+	if source == nil {
+		return nil, nil
+	}
+	var result = make(map[string]string)
+	updator := func(key string, data []byte) {
+		result[key] = string(data)
+	}
+	return assetToMap(source, state, updator, result)
+}
+
+//BinaryAssetsToMap loads binary assets into map[string]string, it takes url, with optional list of extension as filter
+func BinaryAssetsToMap(source interface{}, state data.Map) (interface{}, error) {
+	if source == nil {
+		return nil, nil
+	}
+	var result = make(map[string][]byte)
+	updator := func(key string, data []byte) {
+		result[key] = data
+	}
+	return assetToMap(source, state, updator, result)
+}
+
+func assetToMap(source interface{}, state data.Map, updator func(key string, data []byte), result interface{}) (interface{}, error) {
+	URL, ok := source.(string) //URL param case
+	if ok {
+		return result, loadAssetToMap(url.NewResource(URL), updator)
+	}
+	//url.Resource param case
+	resource := &url.Resource{}
+	if toolbox.IsStruct(source) || toolbox.IsMap(source) {
+		if err := toolbox.DefaultConverter.AssignConverted(&resource, source); err == nil {
+			return result, loadAssetToMap(resource, updator)
+		}
+	}
+	if toolbox.IsSlice(source) { //URL, credentials params case
+		params := toolbox.AsSlice(source)
+		return result, loadAssetToMap(url.NewResource(params...), updator)
+	}
+	return nil, fmt.Errorf("unsupported source %T", source)
+}
+
+func loadAssetToMap(resource *url.Resource, updator func(key string, data []byte)) error {
+	storageService, err := storage.NewServiceForURL(resource.URL, resource.Credentials)
+	if err != nil {
+		return err
+	}
+	objects, err := storageService.List(resource.URL)
+	if err != nil {
+		return err
+	}
+	for _, object := range objects {
+		if object.IsFolder() {
+			continue
+		}
+		reader, err := storageService.Download(object)
+		if err != nil {
+			return err
+		}
+		defer reader.Close()
+		content, err := ioutil.ReadAll(reader)
+		if err != nil {
+			return err
+		}
+		info := object.FileInfo()
+		updator(info.Name(), content)
+	}
+	return err
+}
+
 // Validate if JSON file is a well-formed JSON
 // Returns true if file content is valid JSON
 func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
@@ -253,4 +324,6 @@ func AddStandardUdf(aMap data.Map) {
 	aMap.Put("Markdown", Markdown)
 	aMap.Put("Cat", Cat)
 	aMap.Put("LoadBinary", LoadBinary)
+	aMap.Put("AssetsToMap", AssetsToMap)
+	aMap.Put("BinaryAssetsToMap", BinaryAssetsToMap)
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/viant/neatly"
 	"github.com/viant/toolbox"
 	"github.com/viant/toolbox/data"
+	"github.com/viant/toolbox/storage"
 	"github.com/viant/toolbox/url"
 	"strings"
 	"testing"
@@ -144,4 +145,57 @@ func Test_IsSON(t *testing.T) {
 
 		})
 	}
+}
+
+func Test_AssetsToMap(t *testing.T) {
+	storageService := storage.NewMemoryService()
+	_ = storageService.Upload("mem:///folder1/asset1.txt", strings.NewReader("k1: v1"))
+	_ = storageService.Upload("mem:///folder1/asset2.txt", strings.NewReader("k2: v2"))
+
+	useCases := []struct {
+		description string
+		input       interface{}
+		hasError    bool
+	}{
+		{
+			description: "URL param",
+			input:       "mem:///folder1/",
+		},
+
+		{
+			description: "url.Resource param",
+			input:       url.NewResource("mem:///folder1/"),
+		},
+		{
+			description: "URL, credentials params",
+			input:       []interface{}{"mem:///folder1/", ""},
+		},
+		{
+			description: "invalid param type",
+			input:       12,
+			hasError:    true,
+		},
+	}
+
+	for _, useCase := range useCases {
+		result, err := neatly.AssetsToMap(useCase.input, nil)
+		if useCase.hasError {
+			assert.NotNil(t, err, useCase.description)
+			continue
+		}
+		assert.Nil(t, err)
+		assert.Equal(t, map[string]string{
+			"asset1.txt": "k1: v1",
+			"asset2.txt": "k2: v2",
+		}, result, useCase.description)
+
+		result, _ = neatly.BinaryAssetsToMap(useCase.input, nil)
+		assert.Nil(t, err)
+		assert.Equal(t, map[string][]byte{
+			"asset1.txt": []byte("k1: v1"),
+			"asset2.txt": []byte("k2: v2"),
+		}, result, useCase.description)
+
+	}
+
 }

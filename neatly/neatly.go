@@ -24,7 +24,6 @@ func init() {
 
 }
 
-
 func printJSON(aMap map[string]interface{}) {
 	buf, err := json.MarshalIndent(aMap, "", "\t")
 	if err != nil {
