@@ -9,6 +9,7 @@ import (
 	"github.com/viant/toolbox/url"
 	"strings"
 	"testing"
+	"time"
 )
 
 func Test_Md5(t *testing.T) {
@@ -198,4 +199,76 @@ func Test_AssetsToMap(t *testing.T) {
 
 	}
 
+}
+
+func Test_TimeNowUDFs(t *testing.T) {
+	currentHour, _ := neatly.CurrentHour(nil, nil)
+	assert.Equal(t, time.Now().Hour(), toolbox.AsInt(currentHour))
+}
+
+func Test_MatchToAny(t *testing.T) {
+	var path, err = neatly.WorkingDirectory("./test/matchAnyRows/testrows.txt", nil)
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+
+	useCases := []struct {
+		description string
+		input1      interface{}
+		input2      interface{}
+		expected    bool
+	}{
+		{
+			description: "Value equals 10 and row should match",
+			input1:      "10",
+			input2:      path,
+			expected:    true,
+		},
+		{
+			description: "Value equals 39 and row should match",
+			input1:      "39",
+			input2:      path,
+			expected:    true,
+		},
+		{
+			description: "Value equals a string of text and row should match",
+			input1:      "this is a test",
+			input2:      path,
+			expected:    true,
+		},
+		{
+			description: "Value equals 12345 and row should not match",
+			input1:      "12345",
+			input2:      path,
+			expected:    false,
+		},
+		{
+			description: "Path is not valid should be false",
+			input1:      "12345",
+			input2:      "NOT A VALID PATH",
+			expected:    false,
+		},
+	}
+
+	for _, useCase := range useCases {
+		argumentsMap := map[string]interface{}{
+			"value": useCase.input1.(interface{}),
+			"path":  useCase.input2.(interface{}),
+		}
+		matched, _ := neatly.MatchAnyRow(argumentsMap, nil)
+		assert.Equal(t, useCase.expected, matched)
+	}
+
+	//Testing missing map fields
+	argumentsMap := map[string]interface{}{
+		"value": "test",
+	}
+	matched, _ := neatly.MatchAnyRow(argumentsMap, nil)
+	assert.Equal(t, false, matched)
+
+	argumentsMap = map[string]interface{}{
+		"path": "test",
+	}
+	matched, _ = neatly.MatchAnyRow(argumentsMap, nil)
+	assert.Equal(t, false, matched)
 }
