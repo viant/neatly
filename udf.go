@@ -18,6 +18,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 )
 
 //Md5 computes source md5
@@ -309,6 +310,53 @@ func IsJSON(fileName interface{}, state data.Map) (interface{}, error) {
 	return true, nil
 }
 
+// No parameters
+// Returns the numeric current hour [0,23]
+func CurrentHour(none interface{}, state data.Map) (interface{}, error) {
+	return time.Now().Hour(), nil
+}
+
+const pathKey = "path"
+const valueKey = "value"
+
+// valueAndPath expects a map with keys "path" being the path to the file which contains the rows to match and "value" containing the value to match
+// Return value is a boolean.  True if the compare value matches any row in the file.  False if there is an error or no match is found
+func MatchAnyRow(valueAndPath interface{}, state data.Map) (interface{}, error) {
+	if toolbox.IsMap(valueAndPath) { //URL, credentials params case
+		argumentsMap := toolbox.AsMap(valueAndPath)
+		if validateMatchAnyRowKeys(argumentsMap) {
+			value := toolbox.AsString(argumentsMap[valueKey])
+			path := toolbox.AsString(argumentsMap[pathKey])
+			binaryRows, err := LoadBinary(path, state)
+			if err != nil {
+				return false, nil
+			}
+
+			rows := strings.Split(strings.ReplaceAll(string(binaryRows.([]byte)), "\r\n", "\n"), "\n")
+			for _, row := range rows {
+				if row == value {
+					return true, nil
+				}
+			}
+
+			return false, nil
+		}
+	}
+	return false, fmt.Errorf("unsupported filename and value %T", valueAndPath)
+}
+
+func validateMatchAnyRowKeys(argumentsMap map[string]interface{}) bool {
+	if _, exists := argumentsMap[valueKey]; !exists {
+		return false
+	}
+
+	if _, exists := argumentsMap[pathKey]; !exists {
+		return false
+	}
+
+	return true
+}
+
 //AddStandardUdf register building udf to the context
 func AddStandardUdf(aMap data.Map) {
 	udf.Register(aMap)
@@ -326,4 +374,6 @@ func AddStandardUdf(aMap data.Map) {
 	aMap.Put("LoadBinary", LoadBinary)
 	aMap.Put("AssetsToMap", AssetsToMap)
 	aMap.Put("BinaryAssetsToMap", BinaryAssetsToMap)
+	aMap.Put("CurrentHour", CurrentHour)
+	aMap.Put("MatchAnyRow", MatchAnyRow)
 }

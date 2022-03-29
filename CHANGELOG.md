@@ -1,3 +1,7 @@
+## March 29 2022 - v0.9.0
+  * Added CurrentHour udf
+  * Added MatchAnyRow udf
+
 ## Feb 15 2018 - v0.8.0
   * Added BinaryAssetsToMap, AssetsToMap udfs
   * Added LoadBinary udf
