@@ -159,19 +159,27 @@ func (t *Tag) TagID() string {
 			subPath = ""
 		}
 	}
-	var tagIdPostfix = t.Group + index + subPath
+	var tagIdPostfix = index + subPath
 	if tagIdPostfix != "" && t.tagIdPrefix != "" {
-		tagIdPostfix = "_" + tagIdPostfix
+		tagIdPostfix = " " + tagIdPostfix
 	}
 
 	value := t.Expand(t.tagIdPrefix + tagIdPostfix)
 	var result = make([]byte, 0)
 	for _, r := range value {
+		if r == ' ' {
+			result = append(result, '_')
+			continue
+		}
 		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
 			result = append(result, byte(r))
 		}
 	}
-	return string(result)
+	group := ""
+	if t.Group != "" {
+		group = t.Group + "_"
+	}
+	return group + string(result)
 }
 
 //NewTag creates a new neatly tag
